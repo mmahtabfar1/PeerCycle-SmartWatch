@@ -1,11 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.peer_cycle">
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-feature android:name="android.hardware.type.watch" />
-
-    <application
+   <application
         android:label="peer_cycle"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
@@ -25,11 +20,6 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
-
-            <meta-data
-                android:name="com.google.android.wearable.standalone"
-                android:value="true" />
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

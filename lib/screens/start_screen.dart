@@ -1,3 +1,4 @@
+import 'package:peer_cycle/screens/choose_workout_screen.dart';
 import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:peer_cycle/utils.dart';
@@ -41,19 +42,29 @@ class StartScreen extends StatelessWidget {
                   RoundedButton(
                     text: "Choose Workout",
                     width: screenSize.width,
-                    height: 40
+                    height: 40,
+                    onPressed: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const ChooseWorkoutScreen()
+                        )
+                      )
+                    },
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 5),
                   RoundedButton(
                     text: "Settings",
                     width: screenSize.width,
-                    height: 40
+                    height: 40,
+                    onPressed: () => {},
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 5),
                   RoundedButton(
                       text: "Connect Partners",
                       width: screenSize.width,
-                      height: 40
+                      height: 40,
+                      onPressed: () => {},
                   ),
                 ]
               )

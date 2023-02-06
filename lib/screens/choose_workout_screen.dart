@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AmbientWatchFace extends StatelessWidget {
-  const AmbientWatchFace({super.key});
+class ChooseWorkoutScreen extends StatelessWidget {
+  const ChooseWorkoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) => Scaffold(

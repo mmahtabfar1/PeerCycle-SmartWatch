@@ -62,6 +62,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_bluetooth_serial:
+    dependency: "direct main"
+    description:
+      name: flutter_bluetooth_serial
+      sha256: "248608f777e92e867b642c88327c030fd5eacafb9841d4aa3e34d04ae314de20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.2"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -99,6 +107,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.1"
+  logging:
+    dependency: "direct main"
+    description:
+      name: logging
+      sha256: "04094f2eb032cbb06c6f6e8d3607edcfcb0455e2bb6cbc010cb01171dcb64e6d"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.1"
   matcher:
     dependency: transitive
     description:

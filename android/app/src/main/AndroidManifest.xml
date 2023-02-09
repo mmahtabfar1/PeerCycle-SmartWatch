@@ -2,6 +2,7 @@
     package="com.example.peer_cycle">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
 
     <uses-feature android:name="android.hardware.type.watch" />
 

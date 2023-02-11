@@ -13,24 +13,26 @@ class BluetoothManager {
   static final BluetoothManager _instance = BluetoothManager();
   static BluetoothManager get instance => _instance;
 
-  // Map to store bluetooth connections
-  final Map<BluetoothDevice, BluetoothConnection> _connections = {};
+  int lastConnectionId = 0;
 
-  // Maps bluetooth MAC address to stream subscription
-  final Map<String, StreamSubscription> _subscriptions = {};
+  /// Maps bluetooth connection id to its connection
+  final Map<int, BluetoothConnection> _connections = {};
 
-  // Device data that will be broadcasted
-  final Map<String, Map<String, double>> _deviceData = {};
+  /// Maps bluetooth connection id to stream subscription
+  final Map<int, StreamSubscription> _subscriptions = {};
 
-  // StreamController for the device data
-  final StreamController<Map<String, Map<String, double>>>
+  /// Device data that will be broadcasted
+  final Map<int, Map<String, String>> _deviceData = {};
+
+  /// StreamController for the device data
+  final StreamController<Map<int, Map<String, String>>>
       _deviceDataStreamController = StreamController.broadcast();
 
-  // Stream for the device data
-  Stream<Map<String, Map<String, double>>> get deviceDataStream =>
+  /// Stream for the device data
+  Stream<Map<int, Map<String, String>>> get deviceDataStream =>
       _deviceDataStreamController.stream;
 
-  // This can be cancelled by cancelling subscription to this stream
+  /// This can be cancelled by cancelling subscription to this stream
   Future<Stream<BluetoothDiscoveryResult>> startDeviceDiscovery() async {
     try {
       return FlutterBluetoothSerial.instance.startDiscovery();
@@ -40,47 +42,73 @@ class BluetoothManager {
     }
   }
 
-  // According to FlutterBluetoothSerial, calling this isn't necessary as long as the event sink is closed
+  /// According to FlutterBluetoothSerial, calling this isn't necessary as long as the event sink is closed
   Future<void> stopDeviceDiscovery() async {
     await FlutterBluetoothSerial.instance.cancelDiscovery();
   }
 
-// Requests bluetooth discoverable status for a certain time.
-// Duration can be capped. Try to stay below 120.
+/// Requests bluetooth discoverable status for a certain time.
+///
+/// Duration can be capped. Try to stay below 120.
   Future<int?> requestDiscoverable(int seconds) async {
     return FlutterBluetoothSerial.instance.requestDiscoverable(seconds);
   }
-
+  
   Future<void> connectToDevice(BluetoothDevice device) async {
     try {
       // Connect the device
       BluetoothConnection connection =
           await BluetoothConnection.toAddress(device.address);
-      _connections[device] = connection;
+      _connections[lastConnectionId] = connection;
 
       // Subscribe to data updates
       StreamSubscription? subscription = connection.input?.listen((data) {
-        updateDeviceData(data);
+        updateDeviceData(lastConnectionId, data);
       }, onDone: () {
         // Checking for when connection is closed
-        disconnectFromDevice(device);
+        disconnectFromDevice(lastConnectionId);
       });
 
       if (subscription != null) {
-        _subscriptions[device.address] = subscription;
+        _subscriptions[lastConnectionId] = subscription;
       }
+      lastConnectionId++;
+    } catch (e) {
+      Logger.root.severe('Error connecting to device: $e');
+    }
+  }
+
+  Future<void> listenForConnections(String sdpName, int timeout) async {
+    try {
+      // Connect the device
+      BluetoothConnection connection =
+          await BluetoothConnection.listenForConnections(sdpName, timeout);
+      _connections[lastConnectionId] = connection;
+
+      // Subscribe to data updates
+      StreamSubscription? subscription = connection.input?.listen((data) {
+        updateDeviceData(lastConnectionId, data);
+      }, onDone: () {
+        // Checking for when connection is closed
+        disconnectFromDevice(lastConnectionId);
+      });
+
+      if (subscription != null) {
+        _subscriptions[lastConnectionId] = subscription;
+      }
+      lastConnectionId++;
     } catch (e) {
       Logger.root.severe('Error connecting to device: $e');
     }
   }
 
   // Method to disconnect from a device
-  Future<void> disconnectFromDevice(BluetoothDevice device) async {
+  Future<void> disconnectFromDevice(int id) async {
     try {
-      await _connections[device]?.close();
-      _connections.remove(device);
-      _deviceData.remove(device.address);
-      _subscriptions[device.address]?.cancel();
+      await _connections[id]?.close();
+      _connections.remove(id);
+      _deviceData.remove(id);
+      _subscriptions[id]?.cancel();
     } catch (e) {
       Logger.root.severe('Error disconnecting from device: $e');
     }
@@ -114,31 +142,25 @@ class BluetoothManager {
 // Format for device data
 //  - Data should be a string encoded as Uint8List
 //  - All values should be separated by ":" (this will be the delimeter)
-//  - First value will be the serial number of the device
 //  - All other values will be pairs of keys and value
-//  - Example data: serial_number:heart_bpm:114.0:calories:5.234:steps:10.124124
-//  - All numbers should be given as doubles
-  Future<void> updateDeviceData(Uint8List data) async {
+  Future<void> updateDeviceData(int id, Uint8List data) async {
     List<String> list = ascii.decode(data).split(':');
     if (list.isEmpty) {
-      Logger.root.warning("Received device data that was empty or not decodeable");
+      Logger.root.severe("Received device data that was empty or not decodeable");
+    }
+    if (list.length % 2 != 0) {
+      Logger.root.severe("Received device data was of odd length");
     }
 
-    if (list.length % 2 == 0) {
-      Logger.root.warning("Received device data of even length. Needs to be odd!");
-    }
-
-    for (int i = 1; i < list.length; i += 2) {
-      if (_deviceData[list[0]] == null) {
-        _deviceData[list[0]] = {};
+    for(int i = 0; i < list.length; i += 2) {
+      String key = list[i];
+      String value = list[i+1];
+      if (_deviceData[id] == null) {
+        _deviceData[id] = {};
       }
-      if (double.tryParse(list[i + 1]) == null) {
-        Logger.root.warning("Expected double in received device data was not parseable");
-      }
-      _deviceData[list[0]]![list[i]] = double.parse(list[i + 1]);
+      _deviceData[id]![key] = value;
     }
-
-    // Update the deviceData stream
     _deviceDataStreamController.sink.add(_deviceData);
   }
+    
 }

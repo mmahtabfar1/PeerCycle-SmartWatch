@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:async';
 
 import 'package:wear/wear.dart';
@@ -15,7 +16,8 @@ class ConnectPeersScreen extends StatefulWidget {
 }
 
 class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
-  final BluetoothManager bluetoothManager = BluetoothManager();
+  //random object for sending random numbers to connections
+  Random random = Random();
 
   List<Widget> devices = [];
   bool scanning = false;
@@ -23,26 +25,57 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   Stream<BluetoothDiscoveryResult>? discoveryStream;
   StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
 
-  void startBluetoothScan() async {
+  _ConnectPeersScreenState() {
+    BluetoothManager.instance.deviceDataStream.listen((dataMap) {
+      print('got data from a connection: $dataMap');
+    });
+  }
+
+  //make the device discoverable and also
+  //listen for bluetooth serial connections
+  void startBluetoothServer() async {
+    int? res = await BluetoothManager.instance.requestDiscoverable(120);
+
+    if(res == null) {
+      print("was not able to make device discoverable");
+      return;
+    }
+
+    await BluetoothManager.instance.listenForConnections("peer-cycle", 120);
+  }
+
+  //starts scanning for other nearby bluetooth devices
+  void startScan() async {
     if(scanning) {
       return;
     }
 
-    discoveryStream = await bluetoothManager.startDeviceDiscovery();
+    discoveryStream = await BluetoothManager.instance.startDeviceDiscovery();
 
     final subscription = discoveryStream?.listen((event) {
       setState(() {
-        final textWidget = Text(
-            event.device.address,
-            style: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1)
-            ));
+        final textWidget = RoundedButton(
+          text: event.device.name ?? "no name",
+          height: 40,
+          width: 40,
+          onPressed: () => {
+            BluetoothManager.instance.connectToDevice(event.device)
+          }
+        );
         devices = [...devices, textWidget];
       });
     });
 
     //set state to now scanning
     setState(() {scanning = true;});
+  }
+
+  //sends a randomly generated number to all currently connected devices
+  void sayHi() async {
+    final int randomNum = random.nextInt(100);
+    String dataStr = "randomNum:$randomNum";
+    print("Broadcasting data: $dataStr");
+    BluetoothManager.instance.broadcastString(dataStr);
   }
 
   @override
@@ -69,10 +102,22 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                   ),
                 ),
                 RoundedButton(
-                  text: "Scan",
+                  text: "Start Server",
                   height: 40,
                   width: screenSize.width + 10,
-                  onPressed: startBluetoothScan,
+                  onPressed: startBluetoothServer,
+                ),
+                RoundedButton(
+                  text: "Scan for other Devices",
+                  height: 40,
+                  width: screenSize.width + 10,
+                  onPressed: startScan,
+                ),
+                RoundedButton(
+                  text: "Say Hi",
+                  height: 40,
+                  width: screenSize.width + 10,
+                  onPressed: sayHi,
                 ),
               ],
             )

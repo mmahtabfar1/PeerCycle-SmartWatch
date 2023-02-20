@@ -8,9 +8,10 @@ import 'dart:typed_data';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:async';
 import 'package:logging/logging.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothManager {
-  static final BluetoothManager _instance = BluetoothManager();
+  static final BluetoothManager _instance = BluetoothManager._();
   static BluetoothManager get instance => _instance;
 
   int lastConnectionId = 0;
@@ -27,6 +28,14 @@ class BluetoothManager {
   /// StreamController for the device data
   final StreamController<Map<int, Map<String, String>>>
       _deviceDataStreamController = StreamController.broadcast();
+
+  /// Private constructor
+  BluetoothManager._() {
+    Logger.root.level = Level.ALL; // defaults to Level.INFO
+    Logger.root.onRecord.listen((record) {
+      print('${record.level.name}: ${record.time}: ${record.message}');
+    });
+  }
 
   /// Stream for the device data
   Stream<Map<int, Map<String, String>>> get deviceDataStream =>
@@ -47,18 +56,27 @@ class BluetoothManager {
     await FlutterBluetoothSerial.instance.cancelDiscovery();
   }
 
-/// Requests bluetooth discoverable status for a certain time.
-///
-/// Duration can be capped. Try to stay below 120.
+  /// Requests bluetooth discoverable status for a certain time.
+  ///
+  /// Duration can be capped. Try to stay below 120.
   Future<int?> requestDiscoverable(int seconds) async {
     return FlutterBluetoothSerial.instance.requestDiscoverable(seconds);
   }
-  
-  Future<void> connectToDevice(BluetoothDevice device) async {
+
+  /// Attempts to connect to bluetooth server as a client
+  /// Returns boolean on whether or not a connection was established
+  Future<bool> connectToDevice(BluetoothDevice device) async {
     try {
+      // Check if device is already connected
+      if(device.isConnected) {
+        throw Exception("Device already connected!");
+      }
+
       // Connect the device
       BluetoothConnection connection =
-          await BluetoothConnection.toAddress(device.address);
+          await BluetoothConnection.toAddress(device.address)
+              .onError((error, stackTrace) => throw Exception(stackTrace));
+
       _connections[lastConnectionId] = connection;
 
       // Subscribe to data updates
@@ -73,12 +91,16 @@ class BluetoothManager {
         _subscriptions[lastConnectionId] = subscription;
       }
       lastConnectionId++;
+      return true;
     } catch (e) {
       Logger.root.severe('Error connecting to device: $e');
+      return false;
     }
   }
 
-  Future<void> listenForConnections(String sdpName, int timeout) async {
+  /// Opens a bluetooth server socket and waits for client to connect
+  /// Returns boolean on whether or not a connection was established
+  Future<bool> listenForConnections(String sdpName, int timeout) async {
     try {
       // Connect the device
       BluetoothConnection connection =
@@ -97,12 +119,14 @@ class BluetoothManager {
         _subscriptions[lastConnectionId] = subscription;
       }
       lastConnectionId++;
+      return true;
     } catch (e) {
       Logger.root.severe('Error connecting to device: $e');
+      return false;
     }
   }
 
-  // Method to disconnect from a device
+  /// Method to disconnect from a device
   Future<void> disconnectFromDevice(int id) async {
     try {
       await _connections[id]?.close();
@@ -114,7 +138,7 @@ class BluetoothManager {
     }
   }
 
-// Sends device data to connected devices
+  /// Sends device data to connected devices
   Future<void> broadcastDeviceDataFromMap(Map<String, double> data) async {
     // Create encoded string
     String? mac = await FlutterBluetoothSerial.instance.address;
@@ -130,31 +154,40 @@ class BluetoothManager {
     broadcastString(dataString);
   }
 
-// Sends string to connected devices
+  /// Sends string to connected devices
   Future<void> broadcastString(String str) async {
-    for (BluetoothConnection connection in _connections.values) {
-      Logger.root.info("Sending string via bluetooth: $str");
-      connection.output.add(ascii.encode(str));
+    for (int id in _connections.keys) {
+      BluetoothConnection connection = _connections[id]!;
+      try {
+        if (!connection.isConnected) {
+          disconnectFromDevice(id);
+        }
+        Logger.root.info("Sending string via bluetooth: $str");
+        connection.output.add(ascii.encode(str));
+      } catch (e) {
+        Logger.root.severe(e);
+      }
     }
   }
 
-// Update device data from connected devices
-// Format for device data
-//  - Data should be a string encoded as Uint8List
-//  - All values should be separated by ":" (this will be the delimeter)
-//  - All other values will be pairs of keys and value
+  /// Update device data from connected devices
+  /// Format for device data
+  ///  - Data should be a string encoded as Uint8List
+  ///  - All values should be separated by ":" (this will be the delimeter)
+  ///  - All other values will be pairs of keys and values
   Future<void> updateDeviceData(int id, Uint8List data) async {
     List<String> list = ascii.decode(data).split(':');
     if (list.isEmpty) {
-      Logger.root.severe("Received device data that was empty or not decodeable");
+      Logger.root
+          .severe("Received device data that was empty or not decodeable");
     }
     if (list.length % 2 != 0) {
       Logger.root.severe("Received device data was of odd length");
     }
 
-    for(int i = 0; i < list.length; i += 2) {
+    for (int i = 0; i < list.length; i += 2) {
       String key = list[i];
-      String value = list[i+1];
+      String value = list[i + 1];
       if (_deviceData[id] == null) {
         _deviceData[id] = {};
       }
@@ -162,5 +195,14 @@ class BluetoothManager {
     }
     _deviceDataStreamController.sink.add(_deviceData);
   }
-    
+
+  Future<void> requestBluetoothPermissions() async {
+    // Implement error/denied permission handling
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.bluetooth,
+      Permission.bluetoothAdvertise,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan
+    ].request();
+  }
 }

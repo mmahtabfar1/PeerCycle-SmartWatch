@@ -37,6 +37,10 @@ dependencies:
   cupertino_icons: ^1.0.2
   wear: ^1.1.0
   workout: ^0.6.0
+  flutter_bluetooth_serial:
+    git:
+      url: https://github.com/JordanHanley/flutter_bluetooth_serial.git
+  logging: ^1.1.1
 
 dev_dependencies:
   flutter_test:

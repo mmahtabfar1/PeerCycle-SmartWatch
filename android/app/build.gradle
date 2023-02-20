@@ -1,3 +1,9 @@
+task wrapper(type: Wrapper){
+    gradleVersion = '7.4.0'
+}
+
+task prepareKotlinBuildScriptModel { }
+
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -51,6 +57,11 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+
+        //dynamically load in google maps API key from local.properties file
+        manifestPlaceholders = [
+                GOOGLE_MAPS_API_KEY: "${localProperties.getProperty("GOOGLE_MAPS_API_KEY")}",
+        ]
     }
 
     buildTypes {

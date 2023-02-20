@@ -2,6 +2,7 @@ import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'package:peer_cycle/screens/settings_screen.dart';
 import 'package:peer_cycle/screens/connect_peers_screen.dart';
 import 'package:peer_cycle/screens/choose_workout_screen.dart';
 
@@ -30,7 +31,7 @@ class StartScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const PersonalWorkoutScreen()
+                            builder: (context) => const ChooseWorkoutScreen()
                         )
                       )
                     },
@@ -39,7 +40,14 @@ class StartScreen extends StatelessWidget {
                     text: "Settings",
                     width: screenSize.width,
                     height: 40,
-                    onPressed: () => {},
+                    onPressed: () => {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SettingsScreen()
+                        )
+                      )
+                    },
                   ),
                   RoundedButton(
                     text: "Connect Peers",

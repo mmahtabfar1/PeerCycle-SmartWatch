@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:peer_cycle/screens/start_screen.dart';
 import 'package:wear/wear.dart';
 
@@ -19,10 +20,22 @@ class MyApp extends StatelessWidget {
 class WatchScreen extends StatelessWidget {
   const WatchScreen({super.key});
 
+  final _channel = const MethodChannel("peer_cycle/app_retain");
+
   @override
   Widget build(BuildContext context) {
-    return WatchShape(
-      builder: (context, shape, widget) => const StartScreen()
+    return WillPopScope(
+      onWillPop: () async {
+        if(Navigator.of(context).canPop()) {
+          return true;
+        } else {
+          _channel.invokeMethod("sendToBackground");
+          return false;
+        }
+      },
+      child: WatchShape(
+        builder: (context, shape, widget) => const StartScreen()
+      )
     );
   }
 }

@@ -41,7 +41,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
       return;
     }
 
-    await BluetoothManager.instance.listenForConnections("peer-cycle", 120);
+    await BluetoothManager.instance.listenForConnections("peer-cycle", 15000);
   }
 
   //starts scanning for other nearby bluetooth devices
@@ -54,8 +54,9 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
 
     final subscription = discoveryStream?.listen((event) {
       setState(() {
+        if(event.device.name == null) return;
         final textWidget = RoundedButton(
-          text: event.device.name ?? "no name",
+          text: event.device.name!,
           height: 40,
           width: 40,
           onPressed: () => {
@@ -101,24 +102,28 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                     children: devices,
                   ),
                 ),
-                RoundedButton(
-                  text: "Start Server",
-                  height: 40,
-                  width: screenSize.width + 10,
-                  onPressed: startBluetoothServer,
-                ),
-                RoundedButton(
-                  text: "Scan for other Devices",
-                  height: 40,
-                  width: screenSize.width + 10,
-                  onPressed: startScan,
-                ),
-                RoundedButton(
-                  text: "Say Hi",
-                  height: 40,
-                  width: screenSize.width + 10,
-                  onPressed: sayHi,
-                ),
+                Row(
+                  children: <Widget>[
+                    RoundedButton(
+                      text: "1",
+                      height: 10,
+                      width: 10,
+                      onPressed: startBluetoothServer,
+                    ),
+                    RoundedButton(
+                      text: "2",
+                      height: 10,
+                      width: 10,
+                      onPressed: startScan,
+                    ),
+                    RoundedButton(
+                      text: "3",
+                      height: 10,
+                      width: 10,
+                      onPressed: sayHi,
+                    ),
+                  ],
+                )
               ],
             )
           )

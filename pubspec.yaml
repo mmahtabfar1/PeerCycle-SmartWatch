@@ -40,6 +40,7 @@ dependencies:
   flutter_bluetooth_serial:
     git:
       url: https://github.com/JordanHanley/flutter_bluetooth_serial.git
+      ref: master
   logging: ^1.1.1
   google_maps_flutter: ^2.2.3
   permission_handler: ^10.2.0

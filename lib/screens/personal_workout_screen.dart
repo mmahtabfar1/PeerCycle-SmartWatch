@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 
@@ -41,26 +42,31 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           setState(() {
             heartRate = event.value.toInt();
           });
+          BluetoothManager.instance.broadcastString("heartRate:${event.value}");
           break;
         case WorkoutFeature.calories:
           setState(() {
             calories = event.value.toInt();
           });
+          BluetoothManager.instance.broadcastString("calories:${event.value}");
           break;
         case WorkoutFeature.steps:
           setState(() {
             steps = event.value.toInt();
           });
+          BluetoothManager.instance.broadcastString("steps:${event.value}");
           break;
         case WorkoutFeature.distance:
           setState(() {
             distance = event.value.toInt();
           });
+          BluetoothManager.instance.broadcastString("distance:${event.value}");
           break;
         case WorkoutFeature.speed:
           setState(() {
             speed = event.value.toInt();
           });
+          BluetoothManager.instance.broadcastString("speed:${event.value}");
           break;
       }
     });
@@ -164,7 +170,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             child: RoundedButton(
-              text: "Start/Stop Workout",
+              text: started ? "Stop Workout" : "Start Workout",
               width: 1,
               height: 40,
               onPressed: toggleWorkout,

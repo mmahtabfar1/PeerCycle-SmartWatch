@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'dart:async';
 
-import 'package:wear/wear.dart';
+import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+//import 'package:wear/wear.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
@@ -18,12 +20,12 @@ class ConnectPeersScreen extends StatefulWidget {
 class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   //random object for sending random numbers to connections
   Random random = Random();
-
+  CountDownController _countDownController = CountDownController();
   List<Widget> devices = [];
   bool scanning = false;
-
-  Stream<BluetoothDiscoveryResult>? discoveryStream;
-  StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
+  bool listening = false;
+  final int DISCOVERABILITY_TIMEOUT = 30;
+  final int SERVER_TIMEOUT = 30;
 
   _ConnectPeersScreenState() {
     BluetoothManager.instance.deviceDataStream.listen((dataMap) {
@@ -34,41 +36,16 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   //make the device discoverable and also
   //listen for bluetooth serial connections
   void startBluetoothServer() async {
-    int? res = await BluetoothManager.instance.requestDiscoverable(120);
+    int? res = await BluetoothManager.instance
+        .requestDiscoverable(DISCOVERABILITY_TIMEOUT);
 
-    if(res == null) {
+    if (res == null) {
       print("was not able to make device discoverable");
       return;
     }
 
-    await BluetoothManager.instance.listenForConnections("peer-cycle", 15000);
-  }
-
-  //starts scanning for other nearby bluetooth devices
-  void startScan() async {
-    if(scanning) {
-      return;
-    }
-
-    discoveryStream = await BluetoothManager.instance.startDeviceDiscovery();
-
-    final subscription = discoveryStream?.listen((event) {
-      setState(() {
-        if(event.device.name == null) return;
-        final textWidget = RoundedButton(
-          text: event.device.name!,
-          height: 40,
-          width: 40,
-          onPressed: () => {
-            BluetoothManager.instance.connectToDevice(event.device)
-          }
-        );
-        devices = [...devices, textWidget];
-      });
-    });
-
-    //set state to now scanning
-    setState(() {scanning = true;});
+    await BluetoothManager.instance
+        .listenForConnections("peer-cycle", SERVER_TIMEOUT * 1000);
   }
 
   //sends a randomly generated number to all currently connected devices
@@ -79,56 +56,185 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
     BluetoothManager.instance.broadcastString(dataStr);
   }
 
+  List<Widget> getMainColumnWidgets() {
+    List<Widget> widgets = [];
+    if (listening) {
+      widgets.add(const Text("Waiting for partners to connect...",
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)));
+
+      widgets.add(const SizedBox(height: 20));
+
+      widgets.add(CircularCountDownTimer(
+          controller: _countDownController,
+          width: 100,
+          height: 100,
+          duration: SERVER_TIMEOUT,
+          fillColor: Colors.blue,
+          ringColor: Colors.red,
+          textStyle: const TextStyle(
+            fontSize: 33.0,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+          textFormat: CountdownTextFormat.S,
+          onComplete: () {
+            setState(() {
+              listening = false;
+            });
+          }));
+    }
+
+    widgets.add(
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+      FloatingActionButton.large(
+        heroTag: "serverBtn",
+        onPressed: () {
+          if (listening) {
+            return;
+          }
+          setState(() {
+            listening = true;
+          });
+          startBluetoothServer();
+        },
+        child: Icon(Icons.wifi_rounded),
+      ),
+      SizedBox(width: 80),
+      FloatingActionButton.large(
+          heroTag: "scanBtn",
+          onPressed: () {
+            if (listening) return;
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const ScanningScreen()));
+          },
+          child: Icon(Icons.search)),
+    ]));
+    return widgets;
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.black,
-    body: WatchShape(
-      builder: (context, shape, widget) {
-        Size screenSize = getWatchScreenSize(context);
-        return Center(
-          child: Container(
-            color: Colors.black,
-            height: screenSize.height,
-            width: screenSize.width,
+      backgroundColor: Colors.black,
+      body: /*WatchShape(builder: (context, shape, widget) {*/
+//        Size screenSize = getWatchScreenSize(context);
+        /*return*/ Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Container(
-                  color: Colors.black,
-                  height: 92,
-                  width: screenSize.width,
-                  child: ListView(
-                    children: devices,
-                  ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: getMainColumnWidgets(),
+        ))/*;*/
+      /*})*/);
+}
+
+class ScanningScreen extends StatefulWidget {
+  const ScanningScreen({super.key});
+
+  @override
+  State<ScanningScreen> createState() => _ScanningScreenState();
+}
+
+class _ScanningScreenState extends State<ScanningScreen> {
+  Stream<BluetoothDiscoveryResult>? discoveryStream;
+  StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
+  late FToast fToast;
+  List<Widget> devices = [];
+  bool connecting = false;
+
+  _ScanningScreenState() {
+    fToast = FToast();
+    discoveryStream = BluetoothManager.instance.startDeviceDiscovery();
+    discoveryStreamSubscription = discoveryStream?.listen((event) {
+      setState(() {
+        if (event.device.name == null) return;
+        final textWidget = RoundedButton(
+            text: event.device.name!,
+            height: 40,
+            width: 40,
+            onPressed: () async {
+              if (connecting) return;
+              setState(() {
+                connecting = true;
+              });
+              // Also keep boolean if currently connecting
+              bool result =
+                  await BluetoothManager.instance.connectToDevice(event.device);
+
+              setState(() {
+                connecting = false;
+              });
+
+              // Make toast
+              Color color = result ? Colors.greenAccent : Colors.redAccent;
+              String text = result ? "Connected!" : "Couldn't Connect!";
+              Color textColor = result ? Colors.black : Colors.white;
+              Icon icon = result ? Icon(Icons.check, color: textColor) : Icon(Icons.close, color: textColor);
+
+              Widget toast = Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 12.0),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.0),
+                  color: color,
                 ),
-                Row(
-                  children: <Widget>[
-                    RoundedButton(
-                      text: "1",
-                      height: 10,
-                      width: 10,
-                      onPressed: startBluetoothServer,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    icon,
+                    SizedBox(
+                      width: 12.0,
                     ),
-                    RoundedButton(
-                      text: "2",
-                      height: 10,
-                      width: 10,
-                      onPressed: startScan,
-                    ),
-                    RoundedButton(
-                      text: "3",
-                      height: 10,
-                      width: 10,
-                      onPressed: sayHi,
-                    ),
+                    Text(text, style: TextStyle(color: textColor)),
                   ],
-                )
-              ],
-            )
-          )
-        );
-      }
-    )
-  );
+                ),
+              );
+              // Show Toast
+              fToast.showToast(
+                  child: toast,
+                  gravity: ToastGravity.TOP,
+                  toastDuration: Duration(seconds: 2));
+
+              // Exit if connected
+              if (result) {
+                Navigator.pop(context);
+              }
+            });
+        devices = [...devices, textWidget];
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    fToast.init(context);
+    return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: Container(
+          height: 50,
+          margin: const EdgeInsets.all(50),
+          child: ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Center(child: Text("Exit"))),
+        ),
+        backgroundColor: Colors.black,
+        body: /*WatchShape(*/
+          /*builder: (context, shape, widget) {
+            Size screenSize = getWatchScreenSize(context);*/
+            /*return*/ Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: devices,
+            )/*;*/
+          /*},
+        ),*/
+      );
+  }
+
+  @override
+  void dispose() {
+    discoveryStreamSubscription?.cancel();
+    super.dispose();
+  }
 }

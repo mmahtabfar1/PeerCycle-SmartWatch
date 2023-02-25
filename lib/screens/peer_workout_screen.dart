@@ -56,6 +56,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
         backgroundColor: Colors.black,
         body: WatchShape(
@@ -70,7 +71,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                         children: [
                           Column(children: [
                             const Icon(
-                              Icons.heart_broken,
+                              Icons.favorite,
                               color: Colors.red,
                             ),
                             Text(

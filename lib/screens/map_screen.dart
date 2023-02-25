@@ -16,6 +16,7 @@ class _MapScreenState extends State<MapScreen>
 
   //the blue pin showing the users location
   Marker userMarker = Marker(
+    flat: true,
     markerId: userMarkerId,
     icon: userMarkerIcon,
     position: const LatLng(

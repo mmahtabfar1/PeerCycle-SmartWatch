@@ -25,12 +25,6 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   Stream<BluetoothDiscoveryResult>? discoveryStream;
   StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
 
-  _ConnectPeersScreenState() {
-    BluetoothManager.instance.deviceDataStream.listen((dataMap) {
-      print('got data from a connection: $dataMap');
-    });
-  }
-
   //make the device discoverable and also
   //listen for bluetooth serial connections
   void startBluetoothServer() async {

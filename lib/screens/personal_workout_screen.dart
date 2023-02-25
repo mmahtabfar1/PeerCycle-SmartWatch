@@ -33,8 +33,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
 
   _PersonalWorkoutScreenState() {
     workout.stream.listen((event) {
-      print('${event.feature}: ${event.value} (${event.timestamp})');
-
       switch(event.feature) {
         case WorkoutFeature.unknown:
           return;
@@ -100,86 +98,89 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    backgroundColor: Colors.black,
-    body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(children: [
-                const Icon(
-                  Icons.heart_broken,
-                  color: Colors.red,
-                ),
-                Text(
-                  heartRate.toString(),
-                  style: TextStyle(color: Colors.blue[600], fontSize: 30),
-                ),
-              ]),
-              const SizedBox(width: 8),
-              Column(children: [
-                const Icon(
-                  Icons.fastfood,
-                  color: Colors.red,
-                ),
-                Text(
-                  calories.toString(),
-                  style: TextStyle(color: Colors.blue[600], fontSize: 30),
-                ),
-              ]),
-              const SizedBox(width: 8),
-              Column(children: [
-                const Icon(
-                  Icons.run_circle,
-                  color: Colors.red,
-                ),
-                Text(
-                  steps.toString(),
-                  style: TextStyle(color: Colors.blue[600], fontSize: 30),
-                ),
-              ]),
-              const SizedBox(width: 8),
-              Column(children: [
-                const Icon(
-                  Icons.speed,
-                  color: Colors.red,
-                ),
-                Text(
-                  speed.toString(),
-                  style: TextStyle(color: Colors.blue[600], fontSize: 30),
-                ),
-              ]),
-              const SizedBox(width: 8),
-              Column(children: [
-                const Icon(
-                  Icons.social_distance,
-                  color: Colors.red,
-                ),
-                Text(
-                  distance.toString(),
-                  style: TextStyle(color: Colors.blue[600], fontSize: 30),
-                ),
-              ]),
-            ]
-          ),
-          const SizedBox(height: 15),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 20),
-            child: RoundedButton(
-              text: started ? "Stop Workout" : "Start Workout",
-              width: 1,
-              height: 40,
-              onPressed: toggleWorkout,
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Column(children: [
+                  const Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  ),
+                  Text(
+                    heartRate.toString(),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                  ),
+                ]),
+                const SizedBox(width: 8),
+                Column(children: [
+                  const Icon(
+                    Icons.fastfood,
+                    color: Colors.red,
+                  ),
+                  Text(
+                    calories.toString(),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                  ),
+                ]),
+                const SizedBox(width: 8),
+                Column(children: [
+                  const Icon(
+                    Icons.run_circle,
+                    color: Colors.red,
+                  ),
+                  Text(
+                    steps.toString(),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                  ),
+                ]),
+                const SizedBox(width: 8),
+                Column(children: [
+                  const Icon(
+                    Icons.speed,
+                    color: Colors.red,
+                  ),
+                  Text(
+                    speed.toString(),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                  ),
+                ]),
+                const SizedBox(width: 8),
+                Column(children: [
+                  const Icon(
+                    Icons.social_distance,
+                    color: Colors.red,
+                  ),
+                  Text(
+                    distance.toString(),
+                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                  ),
+                ]),
+              ]
             ),
-          )
-        ],
+            const SizedBox(height: 15),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: RoundedButton(
+                text: started ? "Stop Workout" : "Start Workout",
+                width: 1,
+                height: 40,
+                onPressed: toggleWorkout,
+              ),
+            )
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 
   @override
   bool get wantKeepAlive => true;

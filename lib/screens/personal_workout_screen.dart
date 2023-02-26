@@ -4,7 +4,14 @@ import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 
 class PersonalWorkoutScreen extends StatefulWidget {
-  const PersonalWorkoutScreen({super.key});
+  const PersonalWorkoutScreen({
+    super.key,
+    required this.workout,
+    required this.exerciseType
+  });
+
+  final Workout workout;
+  final ExerciseType exerciseType;
 
   @override
   State<PersonalWorkoutScreen> createState() => _PersonalWorkoutScreenState();
@@ -12,7 +19,6 @@ class PersonalWorkoutScreen extends StatefulWidget {
 
 class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   with AutomaticKeepAliveClientMixin<PersonalWorkoutScreen> {
-  final workout = Workout();
 
   final exerciseType = ExerciseType.walking;
   final features = [
@@ -29,10 +35,10 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   int distance = 0;
   int speed = 0;
 
-  bool started = false;
-
-  _PersonalWorkoutScreenState() {
-    workout.stream.listen((event) {
+  @override
+  void initState() {
+    super.initState();
+    widget.workout.stream.listen((event) {
       switch(event.feature) {
         case WorkoutFeature.unknown:
           return;
@@ -70,31 +76,8 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     });
   }
 
-  void toggleWorkout() async {
-    if(started) {
-      await workout.stop();
-    }
-    else {
-      final result = await workout.start(
-        // In a real application, check the supported exercise types first
-        exerciseType: exerciseType,
-        features: features,
-        enableGps: true,
-      );
-
-      if (result.unsupportedFeatures.isNotEmpty) {
-        // ignore: avoid_print
-        print('Unsupported features: ${result.unsupportedFeatures}');
-        // In a real application, update the UI to match
-      } else {
-        // ignore: avoid_print
-        print('All requested features supported');
-      }
-    }
-
-    setState(() => {
-      started = !started
-    });
+  void stopWorkout() async {
+    await widget.workout.stop();
   }
 
   @override
@@ -170,10 +153,13 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               child: RoundedButton(
-                text: started ? "Stop Workout" : "Start Workout",
+                text: "Stop Workout",
                 width: 1,
                 height: 40,
-                onPressed: toggleWorkout,
+                onPressed: () {
+                  stopWorkout();
+                  Navigator.pop(context);
+                },
               ),
             )
           ],

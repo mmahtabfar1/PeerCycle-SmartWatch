@@ -42,7 +42,7 @@ class BluetoothManager {
       _deviceDataStreamController.stream;
 
   /// This can be cancelled by cancelling subscription to this stream
-  Future<Stream<BluetoothDiscoveryResult>> startDeviceDiscovery() async {
+  Stream<BluetoothDiscoveryResult> startDeviceDiscovery() {
     try {
       return FlutterBluetoothSerial.instance.startDiscovery();
     } catch (e) {
@@ -198,7 +198,7 @@ class BluetoothManager {
 
   Future<void> requestBluetoothPermissions() async {
     // Implement error/denied permission handling
-    Map<Permission, PermissionStatus> statuses = await [
+    await [
       Permission.bluetooth,
       Permission.bluetoothAdvertise,
       Permission.bluetoothConnect,

@@ -30,8 +30,8 @@ class StartScreen extends StatelessWidget {
           return Center(
             child: Container(
               color: Colors.black,
-              height: screenSize.height,
-              width: screenSize.width,
+              height: screenSize.height + 10,
+              width: screenSize.width + 10,
               child: ListView(
                 children: <Widget>[
                   Row(

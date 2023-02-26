@@ -1,13 +1,24 @@
 import 'package:wear/wear.dart';
+import 'package:workout/workout.dart';
 import 'package:flutter/material.dart';
 import 'package:peer_cycle/utils.dart';
+import 'package:peer_cycle/screens/workout_screen.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/screens/settings_screen.dart';
 import 'package:peer_cycle/screens/connect_peers_screen.dart';
-import 'package:peer_cycle/screens/choose_workout_screen.dart';
 
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
+
+  //start the selected workout
+  void startWorkout(BuildContext context, ExerciseType exerciseType) {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => WorkoutScreen(exerciseType: exerciseType)
+        )
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,19 +34,41 @@ class StartScreen extends StatelessWidget {
               width: screenSize.width,
               child: ListView(
                 children: <Widget>[
-                  RoundedButton(
-                    text: "Choose Workout",
-                    width: screenSize.width,
-                    height: 40,
-                    onPressed: () => {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ChooseWorkoutScreen()
-                        )
-                      )
-                    },
+                  Row(
+                    children: [
+                      IconButton(
+                          icon: const Icon(
+                            Icons.hiking,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                          onPressed: () => {
+                            startWorkout(context, ExerciseType.walking)
+                          }
+                      ),
+                      IconButton(
+                          icon: const Icon(
+                            Icons.directions_run,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                          onPressed: () => {
+                            startWorkout(context, ExerciseType.running)
+                          }
+                      ),
+                      IconButton(
+                          icon: const Icon(
+                            Icons.directions_bike,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                          onPressed: () => {
+                            startWorkout(context, ExerciseType.biking)
+                          }
+                      ),
+                    ]
                   ),
+                  const SizedBox(height: 5),
                   RoundedButton(
                     text: "Settings",
                     width: screenSize.width,

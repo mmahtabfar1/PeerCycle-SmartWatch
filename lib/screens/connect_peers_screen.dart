@@ -188,60 +188,63 @@ class _ScanningScreenState extends State<ScanningScreen> {
     discoveryStreamSubscription = discoveryStream?.listen((event) {
       setState(() {
         if (event.device.name == null || event.device.isConnected) return;
-        final textWidget = RoundedButton(
-            text: event.device.name!,
-            height: 40,
-            width: 40,
-            onPressed: () async {
-              if (connecting) return;
-              setState(() {
-                connecting = true;
-              });
-              // Also keep boolean if currently connecting
-              bool result =
-                  await BluetoothManager.instance.connectToDevice(event.device);
-
-              setState(() {
-                connecting = false;
-              });
-
-              // Make toast
-              Color color = result ? Colors.greenAccent : Colors.redAccent;
-              String text = result ? "Connected!" : "Couldn't Connect!";
-              Color textColor = result ? Colors.black : Colors.white;
-              Icon icon = result
-                  ? Icon(Icons.check, color: textColor)
-                  : Icon(Icons.close, color: textColor);
-
-              Widget toast = Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 24.0, vertical: 12.0),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25.0),
-                  color: color,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    icon,
-                    SizedBox(
-                      width: 12.0,
-                    ),
-                    Text(text, style: TextStyle(color: textColor)),
-                  ],
-                ),
-              );
-              // Show Toast
-              fToast.showToast(
-                  child: toast,
-                  gravity: ToastGravity.TOP,
-                  toastDuration: Duration(seconds: 2));
-
-              // Exit if connected
-              if (result) {
-                Navigator.pop(context);
-              }
-            });
+        final textWidget = Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 25),
+          child: RoundedButton(
+              text: event.device.name!,
+              height: 40,
+              width: 40,
+              onPressed: () async {
+                if (connecting) return;
+                setState(() {
+                  connecting = true;
+                });
+                // Also keep boolean if currently connecting
+                bool result =
+                    await BluetoothManager.instance.connectToDevice(event.device);
+        
+                setState(() {
+                  connecting = false;
+                });
+        
+                // Make toast
+                Color color = result ? Colors.greenAccent : Colors.redAccent;
+                String text = result ? "Connected!" : "Couldn't Connect!";
+                Color textColor = result ? Colors.black : Colors.white;
+                Icon icon = result
+                    ? Icon(Icons.check, color: textColor)
+                    : Icon(Icons.close, color: textColor);
+        
+                Widget toast = Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 24.0, vertical: 12.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25.0),
+                    color: color,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      icon,
+                      SizedBox(
+                        width: 12.0,
+                      ),
+                      Text(text, style: TextStyle(color: textColor)),
+                    ],
+                  ),
+                );
+                // Show Toast
+                fToast.showToast(
+                    child: toast,
+                    gravity: ToastGravity.TOP,
+                    toastDuration: Duration(seconds: 2));
+        
+                // Exit if connected
+                if (result) {
+                  Navigator.pop(context);
+                }
+              }),
+        );
         devices = [...devices, textWidget];
       });
     });

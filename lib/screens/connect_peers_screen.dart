@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//import 'package:wear/wear.dart';
+import 'package:wear/wear.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
@@ -20,6 +20,7 @@ class ConnectPeersScreen extends StatefulWidget {
 class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   //random object for sending random numbers to connections
   Random random = Random();
+  late FToast fToast;
   CountDownController _countDownController = CountDownController();
   List<Widget> devices = [];
   bool scanning = false;
@@ -28,6 +29,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   final int SERVER_TIMEOUT = 30;
 
   _ConnectPeersScreenState() {
+    fToast = FToast();
     BluetoothManager.instance.deviceDataStream.listen((dataMap) {
       print('got data from a connection: $dataMap');
     });
@@ -35,16 +37,16 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
 
   //make the device discoverable and also
   //listen for bluetooth serial connections
-  void startBluetoothServer() async {
+  Future<bool> startBluetoothServer() async {
     int? res = await BluetoothManager.instance
         .requestDiscoverable(DISCOVERABILITY_TIMEOUT);
 
     if (res == null) {
       print("was not able to make device discoverable");
-      return;
+      return false;
     }
 
-    await BluetoothManager.instance
+    return await BluetoothManager.instance
         .listenForConnections("peer-cycle", SERVER_TIMEOUT * 1000);
   }
 
@@ -89,14 +91,49 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
       FloatingActionButton.large(
         heroTag: "serverBtn",
-        onPressed: () {
+        onPressed: () async {
           if (listening) {
             return;
           }
           setState(() {
             listening = true;
           });
-          startBluetoothServer();
+          bool result = await startBluetoothServer();
+          setState(() {
+            listening = false;
+          });
+
+          // Make toast
+          Color color = result ? Colors.greenAccent : Colors.redAccent;
+          String text = result ? "Connected!" : "Couldn't Connect!";
+          Color textColor = result ? Colors.black : Colors.white;
+          Icon icon = result
+              ? Icon(Icons.check, color: textColor)
+              : Icon(Icons.close, color: textColor);
+
+          Widget toast = Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(25.0),
+              color: color,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                icon,
+                SizedBox(
+                  width: 12.0,
+                ),
+                Text(text, style: TextStyle(color: textColor)),
+              ],
+            ),
+          );
+          // Show Toast
+          fToast.showToast(
+              child: toast,
+              gravity: ToastGravity.TOP,
+              toastDuration: Duration(seconds: 2));
         },
         child: Icon(Icons.wifi_rounded),
       ),
@@ -116,16 +153,19 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-      backgroundColor: Colors.black,
-      body: /*WatchShape(builder: (context, shape, widget) {*/
-//        Size screenSize = getWatchScreenSize(context);
-        /*return*/ Center(
-            child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: getMainColumnWidgets(),
-        ))/*;*/
-      /*})*/);
+  Widget build(BuildContext context) {
+    fToast.init(context);
+    return Scaffold(
+        backgroundColor: Colors.black,
+        body: WatchShape(builder: (context, shape, widget) {
+          Size screenSize = getWatchScreenSize(context);
+          return Center(
+              child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: getMainColumnWidgets(),
+          ));
+        }));
+  }
 }
 
 class ScanningScreen extends StatefulWidget {
@@ -147,7 +187,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
     discoveryStream = BluetoothManager.instance.startDeviceDiscovery();
     discoveryStreamSubscription = discoveryStream?.listen((event) {
       setState(() {
-        if (event.device.name == null) return;
+        if (event.device.name == null || event.device.isConnected) return;
         final textWidget = RoundedButton(
             text: event.device.name!,
             height: 40,
@@ -169,7 +209,9 @@ class _ScanningScreenState extends State<ScanningScreen> {
               Color color = result ? Colors.greenAccent : Colors.redAccent;
               String text = result ? "Connected!" : "Couldn't Connect!";
               Color textColor = result ? Colors.black : Colors.white;
-              Icon icon = result ? Icon(Icons.check, color: textColor) : Icon(Icons.close, color: textColor);
+              Icon icon = result
+                  ? Icon(Icons.check, color: textColor)
+                  : Icon(Icons.close, color: textColor);
 
               Widget toast = Container(
                 padding: const EdgeInsets.symmetric(
@@ -209,27 +251,27 @@ class _ScanningScreenState extends State<ScanningScreen> {
   Widget build(BuildContext context) {
     fToast.init(context);
     return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: Container(
-          height: 50,
-          margin: const EdgeInsets.all(50),
-          child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Center(child: Text("Exit"))),
-        ),
-        backgroundColor: Colors.black,
-        body: /*WatchShape(*/
-          /*builder: (context, shape, widget) {
-            Size screenSize = getWatchScreenSize(context);*/
-            /*return*/ Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: devices,
-            )/*;*/
-          /*},
-        ),*/
-      );
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Container(
+        height: 50,
+        margin: const EdgeInsets.all(50),
+        child: ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Center(child: Text("Exit"))),
+      ),
+      backgroundColor: Colors.black,
+      body: WatchShape(
+        builder: (context, shape, widget) {
+          Size screenSize = getWatchScreenSize(context);
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: devices,
+          );
+        },
+      ),
+    );
   }
 
   @override

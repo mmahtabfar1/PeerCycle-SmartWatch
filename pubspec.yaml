@@ -44,6 +44,8 @@ dependencies:
   logging: ^1.1.1
   google_maps_flutter: ^2.2.3
   permission_handler: ^10.2.0
+  fluttertoast: ^8.2.1
+  circular_countdown_timer: ^0.2.3
 
 dev_dependencies:
   flutter_test:

@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:logging/logging.dart';
 import 'package:wear/wear.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:flutter/material.dart';
@@ -20,18 +21,20 @@ class ConnectPeersScreen extends StatefulWidget {
 class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   //random object for sending random numbers to connections
   Random random = Random();
-  late FToast fToast;
-  CountDownController _countDownController = CountDownController();
+  FToast fToast = FToast();
+  final CountDownController _countDownController = CountDownController();
   List<Widget> devices = [];
   bool scanning = false;
   bool listening = false;
-  final int DISCOVERABILITY_TIMEOUT = 30;
-  final int SERVER_TIMEOUT = 30;
+  final int discoverabilityTimeout = 30;
+  final int serverTimeout = 30;
+
+  //Logger
+  final logger = Logger("connect_peers_screen_logger");
 
   _ConnectPeersScreenState() {
-    fToast = FToast();
     BluetoothManager.instance.deviceDataStream.listen((dataMap) {
-      print('got data from a connection: $dataMap');
+      logger.log(Level.INFO, 'got data from a connection: $dataMap');
     });
   }
 
@@ -39,43 +42,38 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   //listen for bluetooth serial connections
   Future<bool> startBluetoothServer() async {
     int? res = await BluetoothManager.instance
-        .requestDiscoverable(DISCOVERABILITY_TIMEOUT);
+        .requestDiscoverable(discoverabilityTimeout);
 
     if (res == null) {
-      print("was not able to make device discoverable");
+      logger.log(Level.WARNING, 'was not able to make device discoverable');
       return false;
     }
 
     return await BluetoothManager.instance
-        .listenForConnections("peer-cycle", SERVER_TIMEOUT * 1000);
-  }
-
-  //sends a randomly generated number to all currently connected devices
-  void sayHi() async {
-    final int randomNum = random.nextInt(100);
-    String dataStr = "randomNum:$randomNum";
-    print("Broadcasting data: $dataStr");
-    BluetoothManager.instance.broadcastString(dataStr);
+        .listenForConnections("peer-cycle", serverTimeout * 1000);
   }
 
   List<Widget> getMainColumnWidgets() {
     List<Widget> widgets = [];
     if (listening) {
-      widgets.add(const Text("Waiting for partners to connect...",
-          style: TextStyle(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)));
+      widgets.add(Container(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
+        child: const Text("Waiting for partners to connect...",
+            style: TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)))
+      );
 
-      widgets.add(const SizedBox(height: 20));
+      widgets.add(const SizedBox(height: 2));
 
       widgets.add(CircularCountDownTimer(
           controller: _countDownController,
-          width: 100,
-          height: 100,
-          duration: SERVER_TIMEOUT,
+          width: 50,
+          height: 50,
+          duration: serverTimeout,
           fillColor: Colors.blue,
           ringColor: Colors.red,
           textStyle: const TextStyle(
-            fontSize: 33.0,
+            fontSize: 30.0,
             color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
@@ -89,7 +87,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
 
     widgets.add(
         Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
-      FloatingActionButton.large(
+      FloatingActionButton(
         heroTag: "serverBtn",
         onPressed: () async {
           if (listening) {
@@ -113,7 +111,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
 
           Widget toast = Container(
             padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+                const EdgeInsets.symmetric(horizontal: 2.0, vertical: 12.0),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(25.0),
               color: color,
@@ -122,7 +120,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 icon,
-                SizedBox(
+                const SizedBox(
                   width: 12.0,
                 ),
                 Text(text, style: TextStyle(color: textColor)),
@@ -133,12 +131,12 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
           fToast.showToast(
               child: toast,
               gravity: ToastGravity.TOP,
-              toastDuration: Duration(seconds: 2));
+              toastDuration: const Duration(seconds: 2));
         },
-        child: Icon(Icons.wifi_rounded),
+        child: const Icon(Icons.wifi_rounded),
       ),
-      SizedBox(width: 80),
-      FloatingActionButton.large(
+      const SizedBox(width: 18),
+      FloatingActionButton(
           heroTag: "scanBtn",
           onPressed: () {
             if (listening) return;
@@ -147,7 +145,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                 MaterialPageRoute(
                     builder: (context) => const ScanningScreen()));
           },
-          child: Icon(Icons.search)),
+          child: const Icon(Icons.search)),
     ]));
     return widgets;
   }
@@ -160,11 +158,18 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
         body: WatchShape(builder: (context, shape, widget) {
           Size screenSize = getWatchScreenSize(context);
           return Center(
-              child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: getMainColumnWidgets(),
-          ));
-        }));
+              child: Container(
+                color: Colors.black,
+                height: screenSize.height,
+                width: screenSize.width + 50,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: getMainColumnWidgets(),
+                ),
+              )
+          );
+        })
+    );
   }
 }
 
@@ -217,7 +222,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
         
                 Widget toast = Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 24.0, vertical: 12.0),
+                      horizontal: 10.0, vertical: 12.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     color: color,
@@ -226,7 +231,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       icon,
-                      SizedBox(
+                      const SizedBox(
                         width: 12.0,
                       ),
                       Text(text, style: TextStyle(color: textColor)),
@@ -237,10 +242,10 @@ class _ScanningScreenState extends State<ScanningScreen> {
                 fToast.showToast(
                     child: toast,
                     gravity: ToastGravity.TOP,
-                    toastDuration: Duration(seconds: 2));
+                    toastDuration: const Duration(seconds: 2));
         
                 // Exit if connected
-                if (result) {
+                if (result && context.mounted) {
                   Navigator.pop(context);
                 }
               }),
@@ -256,8 +261,9 @@ class _ScanningScreenState extends State<ScanningScreen> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
-        height: 50,
-        margin: const EdgeInsets.all(50),
+        height: 30,
+        width: 100,
+        margin: const EdgeInsets.only(bottom: 10),
         child: ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
@@ -267,9 +273,8 @@ class _ScanningScreenState extends State<ScanningScreen> {
       backgroundColor: Colors.black,
       body: WatchShape(
         builder: (context, shape, widget) {
-          Size screenSize = getWatchScreenSize(context);
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          return ListView(
+            padding: const EdgeInsets.only(top: 40, bottom: 40),
             children: devices,
           );
         },

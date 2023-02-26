@@ -198,7 +198,7 @@ class BluetoothManager {
 
   Future<void> requestBluetoothPermissions() async {
     // Implement error/denied permission handling
-    Map<Permission, PermissionStatus> statuses = await [
+    await [
       Permission.bluetooth,
       Permission.bluetoothAdvertise,
       Permission.bluetoothConnect,

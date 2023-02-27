@@ -54,7 +54,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           });
           BluetoothManager.instance.broadcastString("calories:${event.value}");
           break;
-        case WorkoutFeature.steps:
+        case WorkoutFeature.steps: //change to time.
           setState(() {
             steps = event.value.toInt();
           });
@@ -90,61 +90,71 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Column(children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   const Icon(
-                    Icons.favorite,
+                    Icons.favorite_border,
                     color: Colors.red,
                   ),
                   Text(
                     heartRate.toString(),
-                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
-                Column(children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   const Icon(
-                    Icons.fastfood,
-                    color: Colors.red,
+                    Icons.whatshot,
+                    color: Colors.deepOrange,
                   ),
                   Text(
                     calories.toString(),
-                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
-                Column(children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   const Icon(
-                    Icons.run_circle,
-                    color: Colors.red,
+                    Icons.timer,
+                    color: Colors.lightGreen,
                   ),
                   Text(
                     steps.toString(),
-                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
-                Column(children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   const Icon(
                     Icons.speed,
-                    color: Colors.red,
+                    color: Colors.blue,
                   ),
                   Text(
                     speed.toString(),
-                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
-                Column(children: [
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
                   const Icon(
                     Icons.social_distance,
-                    color: Colors.red,
+                    color: Colors.grey,
                   ),
                   Text(
                     distance.toString(),
-                    style: TextStyle(color: Colors.blue[600], fontSize: 30),
+                    style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
               ]

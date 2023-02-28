@@ -222,7 +222,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
         
                 Widget toast = Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10.0, vertical: 12.0),
+                      horizontal: 2.0, vertical: 12.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25.0),
                     color: color,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'dart:async';
 
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
@@ -34,10 +35,20 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   int steps = 0;
   int distance = 0;
   int speed = 0;
+  Duration _timer = Duration.zero;
+
+  void startTimer(){
+    Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _timer += Duration(seconds: 1);
+      });
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    startTimer();
     widget.workout.stream.listen((event) {
       switch(event.feature) {
         case WorkoutFeature.unknown:
@@ -78,11 +89,13 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
 
   void stopWorkout() async {
     await widget.workout.stop();
+
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: Center(
@@ -127,7 +140,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     color: Colors.lightGreen,
                   ),
                   Text(
-                    steps.toString(),
+                    _timer.toString().split('.').first.padLeft(8, "0"),
                     style: TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
@@ -149,7 +162,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                   const Icon(
-                    Icons.social_distance,
+                    Icons.place,
                     color: Colors.grey,
                   ),
                   Text(
@@ -161,9 +174,9 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
             ),
             const SizedBox(height: 15),
             Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
+              margin: const EdgeInsets.symmetric(horizontal: 55),
               child: RoundedButton(
-                text: "Stop Workout",
+                text: "End Workout",
                 width: 1,
                 height: 40,
                 onPressed: () {

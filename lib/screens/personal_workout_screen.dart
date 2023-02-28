@@ -1,8 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
+import 'package:peer_cycle/logging/fit_activity_logger.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
-import 'dart:async';
+
+import '../logging/workout_logger.dart';
 
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
@@ -38,53 +44,75 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   Duration _timer = Duration.zero;
 
   void startTimer(){
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _timer += Duration(seconds: 1);
+        _timer += const Duration(seconds: 1);
       });
     });
   }
+
+  final List<WorkoutReading> readings = [];
+  late StreamSubscription<WorkoutReading> workoutStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     startTimer();
-    widget.workout.stream.listen((event) {
-      switch(event.feature) {
+    workoutStreamSubscription = widget.workout.stream.listen((reading) {
+      WorkoutLogger.instance.logMetric(reading);
+      readings.add(reading);
+      switch(reading.feature) {
         case WorkoutFeature.unknown:
           return;
         case WorkoutFeature.heartRate:
           setState(() {
-            heartRate = event.value.toInt();
+            heartRate = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("heartRate:${event.value}");
+          BluetoothManager.instance.broadcastString("heartRate:${reading.value}");
           break;
         case WorkoutFeature.calories:
           setState(() {
-            calories = event.value.toInt();
+            calories = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("calories:${event.value}");
+          BluetoothManager.instance.broadcastString("calories:${reading.value}");
           break;
         case WorkoutFeature.steps: //change to time.
           setState(() {
-            steps = event.value.toInt();
+            steps = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("steps:${event.value}");
+          BluetoothManager.instance.broadcastString("steps:${reading.value}");
           break;
         case WorkoutFeature.distance:
           setState(() {
-            distance = event.value.toInt();
+            distance = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("distance:${event.value}");
+          BluetoothManager.instance.broadcastString("distance:${reading.value}");
           break;
         case WorkoutFeature.speed:
           setState(() {
-            speed = event.value.toInt();
+            speed = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("speed:${event.value}");
+          BluetoothManager.instance.broadcastString("speed:${reading.value}");
           break;
       }
     });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    stopWorkout();
+    workoutStreamSubscription.cancel();
+    writeFitFile();
+    WorkoutLogger.instance.endWorkout();
+  }
+
+  void writeFitFile() async {
+    String currentTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+    String appDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
+    String fitFilePath = "$appDocumentsDirectory/workout@$currentTime.fit";
+    print("fitFilePath: $fitFilePath");
+    await FitActivityLogger.writeFitFile(fitFilePath, readings, exerciseType);
   }
 
   void stopWorkout() async {
@@ -115,7 +143,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   ),
                   Text(
                     heartRate.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
@@ -128,7 +156,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   ),
                   Text(
                     calories.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
@@ -141,7 +169,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   ),
                   Text(
                     _timer.toString().split('.').first.padLeft(8, "0"),
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
@@ -154,7 +182,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   ),
                   Text(
                     speed.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
                 const SizedBox(width: 8),
@@ -167,12 +195,12 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   ),
                   Text(
                     distance.toString(),
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),
               ]
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 2),
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 55),
               child: RoundedButton(

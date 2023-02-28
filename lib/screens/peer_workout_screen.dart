@@ -123,7 +123,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                           const SizedBox(width: 8),
                           Column(children: [
                             const Icon(
-                              Icons.social_distance,
+                              Icons.place,
                               color: Colors.grey,
                             ),
                             Text(

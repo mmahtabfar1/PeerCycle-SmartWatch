@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:fit_tool/fit_tool.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/logging/workout.dart';
 import 'package:workout/workout.dart' hide Workout;
 
@@ -22,16 +22,18 @@ class WorkoutLogger {
     workout?.addMetric(reading);
   }
 
-  void startWorkout(Sport workoutType) {
-    workout = Workout(workoutType);
+  void startWorkout(ExerciseType exerciseType) {
+    workout = Workout(exerciseType);
   }
 
-  void endWorkout() {
+  void endWorkout() async {
     workout?.endWorkout();
     String json = toJson();
     
     // Write to a file
-    File file = File(DateTime.now().toIso8601String()+".json");
+    String appDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
+    File file = File("$appDocumentsDirectory/${DateTime.now().toIso8601String()}.json");
+    print("json log file path: ${file.path}");
     file.writeAsString(json);
 
     // Clean up logging

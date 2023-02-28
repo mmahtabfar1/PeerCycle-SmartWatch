@@ -1,23 +1,23 @@
 import 'dart:core';
 
-import 'package:workout/workout.dart';
-import 'package:fit_tool/fit_tool.dart';
 import 'partner.dart';
+import 'package:workout/workout.dart';
 
 class Workout {
-  Sport workoutType;
+  ExerciseType exerciseType;
   List<Partner> partners = [];
   DateTime startTimestamp;
   DateTime? endTimestamp;
   Map<WorkoutFeature, List<WorkoutReading>> metrics = {};
 
-  Workout(Sport workoutType) : startTimestamp = DateTime.now(), this.workoutType = workoutType;
+  Workout(this.exerciseType) : startTimestamp = DateTime.now();
 
   /// Add partner if doesn't already exist
   void addPartner(Partner partner) {
     for(Partner p in partners) {
-      if(p.deviceId == partner.deviceId)
+      if(p.deviceId == partner.deviceId) {
         return;
+      }
     }
     partners.add(partner);
   }
@@ -29,8 +29,9 @@ class Workout {
 
   /// Add a new metric
   void addMetric(WorkoutReading metric) {
-    if(metrics[metric.feature] == null)
+    if(metrics[metric.feature] == null) {
       metrics[metric.feature] = [];
+    }
     
     metrics[metric.feature]!.add(metric);
   }
@@ -38,9 +39,9 @@ class Workout {
   /// Serialize the workout as a JSON string
   Map<String, dynamic> toJson() {
     int? end =  endTimestamp?.millisecondsSinceEpoch;
-    if(end != null) end ~/ 1000;
+    if(end != null) end = end ~/ 1000;
     Map<String, dynamic> map = {
-      'workout_type': workoutType.toString(),
+      'workout_type': exerciseType.toString().replaceAll("ExerciseType.", ""),
       'partners': partners.map((p) => p.toJson()).toList(),
       'start_timestamp': startTimestamp.millisecondsSinceEpoch ~/ 1000,
       'end_timestamp': end,
@@ -95,5 +96,4 @@ class Workout {
     };
     return map[feature] ?? "unknown";
   }
-
 }

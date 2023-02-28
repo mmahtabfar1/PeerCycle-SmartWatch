@@ -1,6 +1,10 @@
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
+import 'package:workout/workout.dart';
+import 'package:peer_cycle/widgets/rounded_button.dart';
+
+
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({super.key});
@@ -10,10 +14,10 @@ class PeerWorkoutScreen extends StatefulWidget {
 }
 
 class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
-  with AutomaticKeepAliveClientMixin<PeerWorkoutScreen> {
+    with AutomaticKeepAliveClientMixin<PeerWorkoutScreen> {
 
   int heartRate = 0;
-  int calories = 0;
+  int calories = 0; //change to time
   int steps = 0;
   int distance = 0;
   int speed = 0;
@@ -71,61 +75,61 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                         children: [
                           Column(children: [
                             const Icon(
-                              Icons.favorite,
+                              Icons.favorite_border,
                               color: Colors.red,
                             ),
                             Text(
                               heartRate.toString(),
-                              style: TextStyle(color: Colors.blue[600],
-                                  fontSize: 30),
+                              style: TextStyle(color: Colors.white,
+                                  fontSize: 25),
                             ),
                           ]),
                           const SizedBox(width: 8),
                           Column(children: [
                             const Icon(
-                              Icons.fastfood,
-                              color: Colors.red,
+                              Icons.whatshot,
+                              color: Colors.deepOrange,
                             ),
                             Text(
                               calories.toString(),
-                              style: TextStyle(color: Colors.blue[600],
-                                  fontSize: 30),
+                              style: TextStyle(color: Colors.white,
+                                  fontSize: 25),
                             ),
                           ]),
                           const SizedBox(width: 8),
                           Column(children: [
                             const Icon(
-                              Icons.run_circle,
-                              color: Colors.red,
+                              Icons.timer,
+                              color: Colors.lightGreen,
                             ),
                             Text(
                               steps.toString(),
-                              style: TextStyle(color: Colors.blue[600],
-                                  fontSize: 30),
+                              style: TextStyle(color: Colors.white,
+                                  fontSize: 25),
                             ),
                           ]),
                           const SizedBox(width: 8),
                           Column(children: [
                             const Icon(
                               Icons.speed,
-                              color: Colors.red,
+                              color: Colors.blue,
                             ),
                             Text(
                               speed.toString(),
-                              style: TextStyle(color: Colors.blue[600],
-                                  fontSize: 30),
+                              style: TextStyle(color: Colors.white,
+                                  fontSize: 25),
                             ),
                           ]),
                           const SizedBox(width: 8),
                           Column(children: [
                             const Icon(
                               Icons.social_distance,
-                              color: Colors.red,
+                              color: Colors.grey,
                             ),
                             Text(
                               distance.toString(),
-                              style: TextStyle(color: Colors.blue[600],
-                                  fontSize: 30),
+                              style: TextStyle(color: Colors.white,
+                                  fontSize: 25),
                             ),
                           ]),
                         ]

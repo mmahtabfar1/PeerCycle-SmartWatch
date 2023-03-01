@@ -3,13 +3,20 @@ import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
+import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'dart:async';
 
 
 
 class PeerWorkoutScreen extends StatefulWidget {
-  const PeerWorkoutScreen({super.key});
-
+  const PeerWorkoutScreen({
+      super.key,
+      required this.workout,
+      required this.exerciseType
+  });
+  final Workout workout;
+  final ExerciseType exerciseType;
   @override
   State<PeerWorkoutScreen> createState() => _PeerWorkoutScreenState();
 }
@@ -17,13 +24,75 @@ class PeerWorkoutScreen extends StatefulWidget {
 class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     with AutomaticKeepAliveClientMixin<PeerWorkoutScreen> {
 
+  int indivHeartRate = 0;
+  int indivCalories = 0;
+  int indivSpeed = 0;
+  int indivDistance = 0;
+
   int heartRate = 0;
   int calories = 0; //change to time
   int steps = 0;
-  int distance = 0;
   int speed = 0;
+  Duration _timer = Duration.zero;
 
-  _PeerWorkoutScreenState() {
+  void startTimer(){
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        _timer += const Duration(seconds: 1);
+      });
+    });
+  }
+  final Workout workout;
+  final exerciseType = ExerciseType.walking;
+  final features = [
+    WorkoutFeature.heartRate,
+    WorkoutFeature.calories,
+    WorkoutFeature.steps,
+    WorkoutFeature.distance,
+    WorkoutFeature.speed,
+  ];
+
+
+  final List<WorkoutReading> readings = [];
+  late StreamSubscription<WorkoutReading> workoutStreamSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    startTimer();
+    workoutStreamSubscription = widget.workout.stream.listen((reading) {
+      readings.add(reading);
+      switch(reading.feature) {
+        case WorkoutFeature.unknown:
+          return;
+        case WorkoutFeature.heartRate:
+          setState(() {
+            indivHeartRate = reading.value.toInt();
+          });
+          break;
+        case WorkoutFeature.calories:
+          setState(() {
+            indivCalories = reading.value.toInt();
+          });
+          break;
+        case WorkoutFeature.distance:
+          setState(() {
+            indivDistance = reading.value.toInt();
+          });
+          break;
+        case WorkoutFeature.speed:
+          setState(() {
+            indivSpeed = reading.value.toInt();
+          });
+          break;
+      }
+    });
+  }
+
+
+
+
+  _PeerWorkoutScreenState(this.workout) {
     BluetoothManager.instance.deviceDataStream.listen((event) {
       final map = event.values.first;
 
@@ -44,11 +113,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
               steps = double.parse(map[key] ?? "-1").toInt();
             });
             break;
-          case "distance":
-            setState(() {
-              distance = double.parse(map[key] ?? "-1").toInt();
-            });
-            break;
           case "speed":
             setState(() {
               speed = double.parse(map[key] ?? "-1").toInt();
@@ -66,10 +130,10 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
         backgroundColor: Colors.black,
         body: WatchShape(
             builder: (context, shape, widget) {
-              return Stack( //Top Set
+              return Column( //Top Set
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 28),
+                    padding: const EdgeInsets.fromLTRB(28, 18, 28, 5),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,6 +182,15 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                           style: const TextStyle(color: Colors.white, fontSize: 25),
                           ),
                         ]),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+
+                              Text(
+                                _timer.toString().split('.').first.padLeft(8, "0"),
+                                style: const TextStyle(color: Colors.white, fontSize: 25),
+                              ),
+                            ]),
                       ],
                     ),
                   ),
@@ -163,7 +236,7 @@ class _PartnerCardState extends State<PartnerCard> {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white))),
+            child: Center(child: Text("999", style: TextStyle(fontSize: 20, color: Colors.white))),
           ),
           Container(
             decoration: BoxDecoration(
@@ -174,7 +247,7 @@ class _PartnerCardState extends State<PartnerCard> {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white ))),
+            child: Center(child: Text("999", style: TextStyle(fontSize: 20, color: Colors.white ))),
           ),
           Container(
             decoration: BoxDecoration(
@@ -185,7 +258,7 @@ class _PartnerCardState extends State<PartnerCard> {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white))),
+            child: Center(child: Text("999", style: TextStyle(fontSize: 20, color: Colors.white))),
           )
         ],
       ),

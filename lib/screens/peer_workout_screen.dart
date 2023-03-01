@@ -66,33 +66,33 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
         backgroundColor: Colors.black,
         body: WatchShape(
             builder: (context, shape, widget) {
-              return Stack(
+              return Stack( //Top Set
                 children: [
                   Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 28),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
                           children: [
-                            Icon(Icons.favorite_border, color: Colors.red),
-                            SizedBox(height: 5),
-                            Text("99", style: TextStyle(color: Colors.white))
+                            Icon(Icons.favorite_border, color: Colors.red, size: 25,),
+                            SizedBox(height: 1),
+                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         ),
                         Column(
                           children: [
-                            Icon(Icons.speed, color: Colors.blue),
-                            SizedBox(height: 5),
-                            Text("99", style: TextStyle(color: Colors.white))
+                            Icon(Icons.speed, color: Colors.blue, size: 25),
+                            SizedBox(height: 1),
+                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         ),
                         Column(
                           children: [
-                            Icon(Icons.whatshot, color: Colors.deepOrange),
-                            SizedBox(height: 5),
-                            Text("99", style: TextStyle(color: Colors.white))
+                            Icon(Icons.whatshot, color: Colors.deepOrange, size: 25),
+                            SizedBox(height: 1),
+                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         )
                       ],
@@ -107,69 +107,17 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                         SizedBox(height: 10),
                         PartnerCard(),
                         Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Column(children: [
-                                const Icon(
-                                  Icons.favorite_border,
-                                  color: Colors.red,
-                                ),
-                                Text(
-                                  heartRate.toString(),
-                                  style: TextStyle(color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                              ]),
-                              const SizedBox(width: 8),
-                              Column(children: [
-                                const Icon(
-                                  Icons.whatshot,
-                                  color: Colors.deepOrange,
-                                ),
-                                Text(
-                                  calories.toString(),
-                                  style: TextStyle(color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                              ]),
-                              const SizedBox(width: 8),
-                              Column(children: [
-                                const Icon(
-                                  Icons.timer,
-                                  color: Colors.lightGreen,
-                                ),
-                                Text(
-                                  steps.toString(),
-                                  style: TextStyle(color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                              ]),
-                              const SizedBox(width: 8),
-                              Column(children: [
-                                const Icon(
-                                  Icons.speed,
-                                  color: Colors.blue,
-                                ),
-                                Text(
-                                  speed.toString(),
-                                  style: TextStyle(color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                              ]),
-                              const SizedBox(width: 8),
-                              Column(children: [
-                                const Icon(
-                                  Icons.place,
-                                  color: Colors.grey,
-                                ),
-                                Text(
-                                  distance.toString(),
-                                  style: TextStyle(color: Colors.white,
-                                      fontSize: 25),
-                                ),
-                              ]),
-                            ]
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          const Icon(
+                          Icons.place,
+                          color: Colors.grey,
                         ),
+                          Text(
+                          distance.toString(),
+                          style: const TextStyle(color: Colors.white, fontSize: 25),
+                          ),
+                        ]),
                       ],
                     ),
                   ),
@@ -214,7 +162,7 @@ class _PartnerCardState extends State<PartnerCard> {
               )
             ),
             height: 40,
-            width: 40,
+            width: 50,
             child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white))),
           ),
           Container(
@@ -225,7 +173,7 @@ class _PartnerCardState extends State<PartnerCard> {
               )
             ),
             height: 40,
-            width: 40,
+            width: 50,
             child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white ))),
           ),
           Container(
@@ -236,7 +184,7 @@ class _PartnerCardState extends State<PartnerCard> {
               )
             ),
             height: 40,
-            width: 40,
+            width: 50,
             child: Center(child: Text("99", style: TextStyle(fontSize: 20, color: Colors.white))),
           )
         ],

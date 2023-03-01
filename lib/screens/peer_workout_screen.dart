@@ -27,13 +27,13 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   int indivHeartRate = 0;
   int indivCalories = 0;
   int indivSpeed = 0;
-  int indivDistance = 0;
+  double indivDistance = 0;
+  Duration _timer = Duration.zero;
 
   int heartRate = 0;
-  int calories = 0; //change to time
+  int calories = 0;
   int steps = 0;
   int speed = 0;
-  Duration _timer = Duration.zero;
 
   void startTimer(){
     Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -42,7 +42,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
       });
     });
   }
-  final Workout workout;
   final exerciseType = ExerciseType.walking;
   final features = [
     WorkoutFeature.heartRate,
@@ -77,7 +76,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
           break;
         case WorkoutFeature.distance:
           setState(() {
-            indivDistance = reading.value.toInt();
+            indivDistance = reading.value;
           });
           break;
         case WorkoutFeature.speed:
@@ -92,7 +91,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 
 
 
-  _PeerWorkoutScreenState(this.workout) {
+  _PeerWorkoutScreenState() {
     BluetoothManager.instance.deviceDataStream.listen((event) {
       final map = event.values.first;
 
@@ -142,21 +141,21 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                           children: [
                             Icon(Icons.favorite_border, color: Colors.red, size: 25,),
                             SizedBox(height: 1),
-                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
+                            Text(indivHeartRate.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         ),
                         Column(
                           children: [
                             Icon(Icons.speed, color: Colors.blue, size: 25),
                             SizedBox(height: 1),
-                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
+                            Text(indivSpeed.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         ),
                         Column(
                           children: [
                             Icon(Icons.whatshot, color: Colors.deepOrange, size: 25),
                             SizedBox(height: 1),
-                            Text("99", style: TextStyle(color: Colors.white, fontSize: 20))
+                            Text(indivCalories.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
                           ],
                         )
                       ],
@@ -178,7 +177,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                           color: Colors.grey,
                         ),
                           Text(
-                          distance.toString(),
+                            indivDistance.toString() + " km",
                           style: const TextStyle(color: Colors.white, fontSize: 25),
                           ),
                         ]),
@@ -206,6 +205,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 }
 
 class PartnerCard extends StatefulWidget {
+
   const PartnerCard({
     super.key,
   });
@@ -216,6 +216,9 @@ class PartnerCard extends StatefulWidget {
 
 class _PartnerCardState extends State<PartnerCard> {
   @override
+
+
+
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Color(0xFF5B5B5B)),

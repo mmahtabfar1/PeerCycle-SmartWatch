@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/logging/workout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workout/workout.dart' hide Workout;
 
 class WorkoutLogger {
@@ -13,6 +14,7 @@ class WorkoutLogger {
   String? deviceId;
   String? serialNum;
   
+  final List<String> preferences = ["target_heart_rate"];
   static final WorkoutLogger instance = WorkoutLogger._();
 
   WorkoutLogger._();
@@ -28,7 +30,7 @@ class WorkoutLogger {
 
   void endWorkout() async {
     workout?.endWorkout();
-    String json = toJson();
+    String json = await toJson();
     
     // Write to a file
     String appDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
@@ -45,7 +47,7 @@ class WorkoutLogger {
     events.add(event);
   }
 
-  String toJson() {
+  Future<String> toJson() async {
     Map<String, dynamic> map = {
       "name": userName,
       "device_id": deviceId,
@@ -53,6 +55,11 @@ class WorkoutLogger {
       "workout": workout?.toJson(),
       "events": events
     };
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for(String prefKey in preferences) {
+      map[prefKey] = await prefs.get(prefKey);
+    }
     return jsonEncode(map);
   }
 }

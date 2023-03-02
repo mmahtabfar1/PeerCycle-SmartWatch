@@ -117,7 +117,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
 
   void stopWorkout() async {
     await widget.workout.stop();
-
   }
 
   @override

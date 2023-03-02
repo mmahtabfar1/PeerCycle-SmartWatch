@@ -15,7 +15,7 @@ class StartScreen extends StatelessWidget {
   //start the selected workout
   void startWorkout(BuildContext context, ExerciseType exerciseType) async {
     final prefs = await SharedPreferences.getInstance();
-    int? targetHeartRate = await prefs.getInt("target_heart_rate");
+    int? targetHeartRate = prefs.getInt("target_heart_rate");
     if (targetHeartRate == null) {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => TargetHeartRateScreen()));

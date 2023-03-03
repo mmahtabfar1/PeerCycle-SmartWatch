@@ -78,7 +78,10 @@ class WorkoutScreen extends StatelessWidget {
                         "personal_workout_screen",
                       ),
                       getPageViewPage(
-                        const PeerWorkoutScreen(),
+                         PeerWorkoutScreen(
+                            workout: workout,
+                            exerciseType: exerciseType
+                        ),
                         "peer_workout_screen",
                       ),
                       getPageViewPage(

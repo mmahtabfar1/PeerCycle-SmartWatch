@@ -37,6 +37,10 @@ class BluetoothManager {
     });
   }
 
+  Map<int, Map<String, String>> get deviceData {
+    return _deviceData;
+  }
+
   /// Stream for the device data
   Stream<Map<int, Map<String, String>>> get deviceDataStream =>
       _deviceDataStreamController.stream;

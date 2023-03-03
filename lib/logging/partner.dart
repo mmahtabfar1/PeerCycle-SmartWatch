@@ -10,4 +10,10 @@ class Partner {
       'serial_number': serialNum
     };
   }
+
+  Partner({
+    this.name,
+    this.deviceId,
+    this.serialNum
+  });
 }

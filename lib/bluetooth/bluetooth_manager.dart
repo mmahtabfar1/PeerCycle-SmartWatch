@@ -5,10 +5,12 @@ For apps targeting Build.VERSION_CODES#S or or higher, this requires the Manifes
 
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BluetoothManager {
   static final BluetoothManager _instance = BluetoothManager._();
@@ -72,7 +74,7 @@ class BluetoothManager {
   Future<bool> connectToDevice(BluetoothDevice device) async {
     try {
       // Check if device is already connected
-      if(device.isConnected) {
+      if (device.isConnected) {
         throw Exception("Device already connected!");
       }
 
@@ -95,6 +97,7 @@ class BluetoothManager {
         _subscriptions[lastConnectionId] = subscription;
       }
       lastConnectionId++;
+      sendPersonalInfo();
       return true;
     } catch (e) {
       Logger.root.severe('Error connecting to device: $e');
@@ -123,6 +126,7 @@ class BluetoothManager {
         _subscriptions[lastConnectionId] = subscription;
       }
       lastConnectionId++;
+      sendPersonalInfo();
       return true;
     } catch (e) {
       Logger.root.severe('Error connecting to device: $e');
@@ -208,5 +212,34 @@ class BluetoothManager {
       Permission.bluetoothConnect,
       Permission.bluetoothScan
     ].request();
+  }
+
+  /// Sends personal info to connected devices needed for identfication
+  Future<void> sendPersonalInfo() async {
+    // Get Name
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? name = prefs.getString("name");
+
+    // Get device info
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    AndroidDeviceInfo deviceInfo = await deviceInfoPlugin.androidInfo;
+    String? deviceId = deviceInfo.id;
+    String? serialNum = deviceInfo.serialNumber;
+
+    // Send to devices
+    String str = "name:{$name}:device_id:${deviceId}:serial_number:${serialNum}";
+    broadcastString(str);
+  }
+
+  void cleanupLingeringClosedConnections() {
+    for(int id in _connections.keys) {
+      BluetoothConnection connection = _connections[id]!;
+      if(!connection.isConnected) {
+        _connections.remove(id);
+        if(_deviceData[id] != null) {
+          _deviceData.remove(id);
+        }
+      }
+    }
   }
 }

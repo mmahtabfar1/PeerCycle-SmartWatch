@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
+import 'package:peer_cycle/logging/partner.dart';
 import 'package:peer_cycle/secrets/secrets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/logging/workout.dart';
@@ -26,6 +28,17 @@ class WorkoutLogger {
 
   void startWorkout(ExerciseType exerciseType) {
     workout = Workout(exerciseType);
+    // Add the workout partners
+    BluetoothManager.instance.cleanupLingeringClosedConnections();
+    final deviceData = BluetoothManager.instance.deviceData;
+    for(int id in deviceData.keys) {
+      Map<String, String> data = deviceData[id]!;
+      workout?.addPartner(Partner(
+        name: data["name"],
+        deviceId: data["device_id"],
+        serialNum: data["serial_num"]
+      ));
+    }
   }
 
   void endWorkout() async {

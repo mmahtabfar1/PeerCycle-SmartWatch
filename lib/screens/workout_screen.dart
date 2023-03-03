@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:screen_state/screen_state.dart';
 import 'package:wear/wear.dart';
 import 'package:workout/workout.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +15,8 @@ import '../logging/app_event.dart';
 class WorkoutScreen extends StatelessWidget {
   final ExerciseType exerciseType;
   final workout = Workout();
+  final screenState = new Screen();
+  StreamSubscription<ScreenStateEvent>? screenStateSubscription;
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 
   final List<String> pageNames = [];
@@ -19,7 +24,43 @@ class WorkoutScreen extends StatelessWidget {
   WorkoutScreen({
     super.key,
     required this.exerciseType,
-  });
+  }) {
+    // Log Screen state events
+    try {
+      screenStateSubscription = screenState.screenStateStream?.listen((event) { 
+        final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+        switch(event) {
+          case ScreenStateEvent.SCREEN_ON:
+          WorkoutLogger.instance.addEvent({
+            "event_type": AppEvent.screenOn.value,
+            "description": "Screen turned on",
+            "timestamp": timestamp
+          });
+            break;
+          case ScreenStateEvent.SCREEN_OFF:
+          WorkoutLogger.instance.addEvent({
+            "event_type": AppEvent.screenOff.value,
+            "description": "Screen turned off",
+            "timestamp": timestamp
+          });
+            break;
+          case ScreenStateEvent.SCREEN_UNLOCKED:
+          WorkoutLogger.instance.addEvent({
+            "event_type": AppEvent.screenUnlocked.value,
+            "description": "Screen unlocked",
+            "timestamp": timestamp
+          });
+          break;
+        }
+      });
+    } on ScreenStateException catch (e) {
+      print("Error when listening to screen state: $e");
+    }
+  }
+
+  void dispose() {
+    screenStateSubscription?.cancel();
+  }
 
   final features = [
     WorkoutFeature.heartRate,

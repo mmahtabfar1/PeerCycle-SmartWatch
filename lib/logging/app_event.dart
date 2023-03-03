@@ -14,7 +14,11 @@ enum AppEvent {
   // I think these three only refer to BLE devices
   searchForBluetoothDevices(11),
   bluetoothDeviceConnected(12),
-  bluetoothDeviceDisconnected(13);
+  bluetoothDeviceDisconnected(13),
+
+  screenOn(14),
+  screenOff(15),
+  screenUnlocked(16);
 
   const AppEvent(this.value);
   final num value;

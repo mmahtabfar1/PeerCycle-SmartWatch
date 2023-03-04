@@ -29,13 +29,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   with AutomaticKeepAliveClientMixin<PersonalWorkoutScreen> {
 
   final exerciseType = ExerciseType.walking;
-  final features = [
-    WorkoutFeature.heartRate,
-    WorkoutFeature.calories,
-    WorkoutFeature.steps,
-    WorkoutFeature.distance,
-    WorkoutFeature.speed,
-  ];
 
   int heartRate = 0;
   int calories = 0;
@@ -100,10 +93,10 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   }
 
   @override
-  void dispose() {
+  void dispose() async {
     super.dispose();
     stopWorkout();
-    workoutStreamSubscription.cancel();
+    await workoutStreamSubscription.cancel();
     writeFitFile();
     WorkoutLogger.instance.endWorkout();
   }

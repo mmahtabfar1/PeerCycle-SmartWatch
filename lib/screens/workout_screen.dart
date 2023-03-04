@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:logging/logging.dart';
 import 'package:screen_state/screen_state.dart';
 import 'package:wear/wear.dart';
 import 'package:workout/workout.dart';
@@ -9,60 +10,18 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 import 'package:peer_cycle/screens/peer_workout_screen.dart';
 import 'package:peer_cycle/screens/personal_workout_screen.dart';
+import 'package:peer_cycle/logging/app_event.dart';
 
-import '../logging/app_event.dart';
-
-class WorkoutScreen extends StatelessWidget {
-  final ExerciseType exerciseType;
-  final workout = Workout();
-  final screenState = new Screen();
-  StreamSubscription<ScreenStateEvent>? screenStateSubscription;
-  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-
-  final List<String> pageNames = [];
-
-  WorkoutScreen({
+class WorkoutScreen extends StatefulWidget {
+  const WorkoutScreen({
     super.key,
     required this.exerciseType,
-  }) {
-    // Log Screen state events
-    try {
-      screenStateSubscription = screenState.screenStateStream?.listen((event) { 
-        final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        switch(event) {
-          case ScreenStateEvent.SCREEN_ON:
-          WorkoutLogger.instance.addEvent({
-            "event_type": AppEvent.screenOn.value,
-            "description": "Screen turned on",
-            "timestamp": timestamp
-          });
-            break;
-          case ScreenStateEvent.SCREEN_OFF:
-          WorkoutLogger.instance.addEvent({
-            "event_type": AppEvent.screenOff.value,
-            "description": "Screen turned off",
-            "timestamp": timestamp
-          });
-            break;
-          case ScreenStateEvent.SCREEN_UNLOCKED:
-          WorkoutLogger.instance.addEvent({
-            "event_type": AppEvent.screenUnlocked.value,
-            "description": "Screen unlocked",
-            "timestamp": timestamp
-          });
-          break;
-        }
-      });
-    } on ScreenStateException catch (e) {
-      print("Error when listening to screen state: $e");
-    }
-  }
+  });
 
-  void dispose() {
-    screenStateSubscription?.cancel();
-  }
+  final ExerciseType exerciseType;
+  static final log = Logger("workout_screen");
 
-  final features = [
+  static const features = [
     WorkoutFeature.heartRate,
     WorkoutFeature.calories,
     WorkoutFeature.steps,
@@ -70,9 +29,52 @@ class WorkoutScreen extends StatelessWidget {
     WorkoutFeature.speed,
   ];
 
-  Widget getPageViewPage(Widget page, String name) {
-    pageNames.add(name);
-    return page;
+  @override
+  State<StatefulWidget> createState() => _WorkoutScreenState();
+}
+
+class _WorkoutScreenState extends State<WorkoutScreen> {
+  final workout = Workout();
+  final screenState = Screen();
+  StreamSubscription<ScreenStateEvent>? screenStateSubscription;
+  final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+
+  final List<String> pageNames = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Log Screen state events
+    try {
+      screenStateSubscription = screenState.screenStateStream?.listen((event) {
+        final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+        switch(event) {
+          case ScreenStateEvent.SCREEN_ON:
+            WorkoutLogger.instance.addEvent({
+              "event_type": AppEvent.screenOn.value,
+              "description": "Screen turned on",
+              "timestamp": timestamp
+            });
+            break;
+          case ScreenStateEvent.SCREEN_OFF:
+            WorkoutLogger.instance.addEvent({
+              "event_type": AppEvent.screenOff.value,
+              "description": "Screen turned off",
+              "timestamp": timestamp
+            });
+            break;
+          case ScreenStateEvent.SCREEN_UNLOCKED:
+            WorkoutLogger.instance.addEvent({
+              "event_type": AppEvent.screenUnlocked.value,
+              "description": "Screen unlocked",
+              "timestamp": timestamp
+            });
+            break;
+        }
+      });
+    } on ScreenStateException catch (e) {
+      WorkoutScreen.log.severe("Error when listening to screen state: $e");
+    }
   }
 
   Future<WorkoutStartResult> startWorkout() async {
@@ -80,10 +82,10 @@ class WorkoutScreen extends StatelessWidget {
     WorkoutLogger.instance.deviceId = deviceInfo.id;
     WorkoutLogger.instance.serialNum = deviceInfo.serialNumber;
     //TODO: add the user's name to the WorkoutLogger here
-    WorkoutLogger.instance.startWorkout(exerciseType);
+    WorkoutLogger.instance.startWorkout(widget.exerciseType);
     return workout.start(
-      exerciseType: exerciseType,
-      features: features,
+      exerciseType: widget.exerciseType,
+      features: WorkoutScreen.features,
       enableGps: true,
     );
   }
@@ -96,50 +98,62 @@ class WorkoutScreen extends StatelessWidget {
     });
   }
 
+  Widget getPageViewPage(Widget page, String name) {
+    pageNames.add(name);
+    return page;
+  }
+
+  @override
+  void dispose() async {
+    super.dispose();
+    await screenStateSubscription?.cancel();
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<WorkoutStartResult>(
-      future: startWorkout(),
-      builder: (context, snapshot) {
-        if(snapshot.hasData) {
-          return Scaffold(
-            backgroundColor: Colors.black,
-            body: WatchShape(
-              builder: (context, shape, widget) {
-                return Center(
-                  child: PageView(
-                    onPageChanged: handlePageChange,
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      getPageViewPage(
-                        PersonalWorkoutScreen(
-                            workout: workout,
-                            exerciseType: exerciseType
-                        ),
-                        "personal_workout_screen",
-                      ),
-                      getPageViewPage(
-                         PeerWorkoutScreen(
-                            workout: workout,
-                            exerciseType: exerciseType
-                        ),
-                        "peer_workout_screen",
-                      ),
-                      getPageViewPage(
-                        const MapScreen(),
-                        "map_screen",
-                      )
-                    ],
-                  )
-                );
-              }
-            )
+        future: startWorkout(),
+        builder: (context, snapshot) {
+          if(snapshot.hasData) {
+            return Scaffold(
+                backgroundColor: Colors.black,
+                body: WatchShape(
+                    builder: (context, shape, _) {
+                      return Center(
+                          child: PageView(
+                            onPageChanged: handlePageChange,
+                            scrollDirection: Axis.vertical,
+                            children: [
+                              getPageViewPage(
+                                PersonalWorkoutScreen(
+                                    workout: workout,
+                                    exerciseType: widget.exerciseType
+                                ),
+                                "personal_workout_screen",
+                              ),
+                              getPageViewPage(
+                                PeerWorkoutScreen(
+                                    workout: workout,
+                                    exerciseType: widget.exerciseType
+                                ),
+                                "peer_workout_screen",
+                              ),
+                              getPageViewPage(
+                                const MapScreen(),
+                                "map_screen",
+                              )
+                            ],
+                          )
+                      );
+                    }
+                )
+            );
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
           );
         }
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      }
     );
   }
+
 }

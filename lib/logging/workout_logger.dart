@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:convert';
 
+import 'package:logging/logging.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:peer_cycle/logging/partner.dart';
 import 'package:peer_cycle/secrets/secrets.dart';
@@ -21,6 +22,7 @@ class WorkoutLogger {
 
   WorkoutLogger._();
 
+  static final log = Logger("workout_logger");
 
   void logMetric(WorkoutReading reading) {
     workout?.addMetric(reading);
@@ -48,7 +50,7 @@ class WorkoutLogger {
     // Write to a file
     String appDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
     File file = File("$appDocumentsDirectory/${DateTime.now().toIso8601String()}.json");
-    print("json log file path: ${file.path}");
+    log.info("json log file path: ${file.path}");
     file.writeAsString(json);
 
     //upload file to analytics team's Database
@@ -83,13 +85,13 @@ class WorkoutLogger {
     httpClient.close();
 
     if (response.hasSuccessStatusCode) {
-      print(reply);
-      print("SUCCESS UPLOADING");
+      log.info(reply);
+      log.info("SUCCESS UPLOADING");
       return true;
     }
-    print(response.statusCode);
-    print(reply);
-    print("Error uploading workout: ${response.reasonPhrase}");
+    log.warning(response.statusCode);
+    log.warning(reply);
+    log.warning("Error uploading workout: ${response.reasonPhrase}");
     return false;
   }
 
@@ -108,7 +110,7 @@ class WorkoutLogger {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     for(String prefKey in preferences) {
-      map[prefKey] = await prefs.get(prefKey);
+      map[prefKey] = prefs.get(prefKey);
     }
     return jsonEncode(map);
   }

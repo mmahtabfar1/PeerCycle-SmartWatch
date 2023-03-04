@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:peer_cycle/logging/app_event.dart';
+import 'package:peer_cycle/logging/workout_logger.dart';
 
 class RoundedButton extends StatelessWidget {
   final double height;
@@ -17,7 +19,15 @@ class RoundedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () {
+        //log that this button was pressed
+        WorkoutLogger.instance.addEvent({
+          "event_type": AppEvent.buttonPressed.value.toString(),
+          "button_name": "${text.replaceAll(" ", "")}Button",
+          "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        });
+        onPressed();
+      },
       style: ElevatedButton.styleFrom(
         minimumSize: Size(width, height),
         backgroundColor: const Color.fromRGBO(91, 91, 91, 1),

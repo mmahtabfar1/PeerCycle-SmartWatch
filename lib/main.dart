@@ -1,12 +1,23 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:peer_cycle/screens/start_screen.dart';
 import 'package:wear/wear.dart';
+import 'package:logging/logging.dart';
 
-void main() => runApp(const MyApp());
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key}) {
+    Logger.root.onRecord.listen((record) {
+      //if in debug mode write to stdout
+      //can add else clause here to write logs to a file
+      //during production
+      if (kDebugMode) {
+        print('${record.level.name}: ${record.time}: ${record.message}');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) => MaterialApp(

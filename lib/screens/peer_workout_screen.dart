@@ -1,13 +1,9 @@
-import 'package:flutter/rendering.dart';
+import 'package:logging/logging.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
-import 'package:workout/workout.dart';
-import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'dart:async';
-
-
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
@@ -17,6 +13,9 @@ class PeerWorkoutScreen extends StatefulWidget {
   });
   final Workout workout;
   final ExerciseType exerciseType;
+
+  static final log = Logger("peer_workout_screen");
+
   @override
   State<PeerWorkoutScreen> createState() => _PeerWorkoutScreenState();
 }
@@ -51,7 +50,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     WorkoutFeature.speed,
   ];
 
-
   final List<WorkoutReading> readings = [];
   late StreamSubscription<WorkoutReading> workoutStreamSubscription;
 
@@ -62,6 +60,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
       readings.add(reading);
       switch(reading.feature) {
+        case WorkoutFeature.steps:
         case WorkoutFeature.unknown:
           return;
         case WorkoutFeature.heartRate:
@@ -87,9 +86,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
       }
     });
   }
-
-
-
 
   _PeerWorkoutScreenState() {
     BluetoothManager.instance.deviceDataStream.listen((event) {
@@ -127,6 +123,9 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     try {
       return double.tryParse(deviceData.values.elementAt(partnerNum)[attribute]!);
     } catch (e) {
+      PeerWorkoutScreen.log.severe(e.toString());
+      PeerWorkoutScreen.log.severe("ERROR in getPartnerAttribute!!!");
+      PeerWorkoutScreen.log.severe("deviceData: $deviceData");
       return null;
     }
   }
@@ -150,23 +149,23 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                         children: [
                           Column(
                             children: [
-                              Icon(Icons.favorite_border, color: Colors.red, size: 25,),
-                              SizedBox(height: 1),
-                              Text(indivHeartRate.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
+                              const Icon(Icons.favorite_border, color: Colors.red, size: 25,),
+                              const SizedBox(height: 1),
+                              Text(indivHeartRate.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
                             ],
                           ),
                           Column(
                             children: [
-                              Icon(Icons.speed, color: Colors.blue, size: 25),
-                              SizedBox(height: 1),
-                              Text(indivSpeed.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
+                              const Icon(Icons.speed, color: Colors.blue, size: 25),
+                              const SizedBox(height: 1),
+                              Text(indivSpeed.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
                             ],
                           ),
                           Column(
                             children: [
-                              Icon(Icons.whatshot, color: Colors.deepOrange, size: 25),
-                              SizedBox(height: 1),
-                              Text(indivCalories.toString(), style: TextStyle(color: Colors.white, fontSize: 20))
+                              const Icon(Icons.whatshot, color: Colors.deepOrange, size: 25),
+                              const SizedBox(height: 1),
+                              Text(indivCalories.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
                             ],
                           )
                         ],
@@ -182,7 +181,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                             speed: getPartnerAttribute(0, "speed")?.toInt(),
                             calories: getPartnerAttribute(0, "calories")?.toInt()
                           ),
-                          SizedBox(height: 6),
+                          const SizedBox(height: 6),
                           PartnerCard(
                             heartRate: getPartnerAttribute(1, "heartRate")?.toInt(),
                             speed: getPartnerAttribute(1, "speed")?.toInt(),
@@ -196,7 +195,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                             color: Colors.grey,
                           ),
                             Text(
-                            indivDistance.toString() + " km",
+                            "$indivDistance m",
                             style: const TextStyle(color: Colors.white, fontSize: 25),
                             ),
                           ]),
@@ -225,12 +224,11 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 }
 
 class PartnerCard extends StatelessWidget {
+  final int? heartRate;
+  final int? calories;
+  final int? speed;
 
-  int? heartRate;
-  int? calories;
-  int? speed;
-
-   PartnerCard({
+   const PartnerCard({
     super.key,
     this.heartRate,
     this.calories,
@@ -240,11 +238,11 @@ class PartnerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Color(0xFF5B5B5B)),
+      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Color(0xFF5B5B5B)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
+          const SizedBox(
             height: 40,
             width: 35,
             child: Icon(Icons.person)
@@ -258,7 +256,7 @@ class PartnerCard extends StatelessWidget {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text(heartRate != null ? heartRate.toString() : "--", style: TextStyle(fontSize: 20, color: Colors.white))),
+            child: Center(child: Text(heartRate != null ? heartRate.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white))),
           ),
           Container(
             decoration: BoxDecoration(
@@ -269,7 +267,7 @@ class PartnerCard extends StatelessWidget {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text(speed != null ? speed.toString() : "--", style: TextStyle(fontSize: 20, color: Colors.white ))),
+            child: Center(child: Text(speed != null ? speed.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white ))),
           ),
           Container(
             decoration: BoxDecoration(
@@ -280,7 +278,7 @@ class PartnerCard extends StatelessWidget {
             ),
             height: 40,
             width: 50,
-            child: Center(child: Text(calories != null ? calories.toString() : "--", style: TextStyle(fontSize: 20, color: Colors.white))),
+            child: Center(child: Text(calories != null ? calories.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white))),
           )
         ],
       ),

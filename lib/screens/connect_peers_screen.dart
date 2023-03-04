@@ -30,11 +30,11 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
   final int serverTimeout = 30;
 
   //Logger
-  final logger = Logger("connect_peers_screen_logger");
+  static final log = Logger("connect_peers_screen");
 
   _ConnectPeersScreenState() {
     BluetoothManager.instance.deviceDataStream.listen((dataMap) {
-      logger.log(Level.INFO, 'got data from a connection: $dataMap');
+      log.log(Level.INFO, 'got data from a connection: $dataMap');
     });
   }
 
@@ -45,7 +45,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
         .requestDiscoverable(discoverabilityTimeout);
 
     if (res == null) {
-      logger.log(Level.WARNING, 'was not able to make device discoverable');
+      log.log(Level.WARNING, 'was not able to make device discoverable');
       return false;
     }
 

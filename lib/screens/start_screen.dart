@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/screens/workout_screen.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'package:peer_cycle/widgets/start_exercise_button.dart';
 import 'package:peer_cycle/screens/settings_screen.dart';
 import 'package:peer_cycle/screens/connect_peers_screen.dart';
 
@@ -16,9 +17,9 @@ class StartScreen extends StatelessWidget {
   void startWorkout(BuildContext context, ExerciseType exerciseType) async {
     final prefs = await SharedPreferences.getInstance();
     int? targetHeartRate = prefs.getInt("target_heart_rate");
-    if (targetHeartRate == null) {
+    if (targetHeartRate == null && context.mounted) {
       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => TargetHeartRateScreen()));
+          MaterialPageRoute(builder: (context) => const TargetHeartRateScreen()));
     } else {
       Navigator.push(
           context,
@@ -41,30 +42,39 @@ class StartScreen extends StatelessWidget {
                     width: screenSize.width + 10,
                     child: ListView(children: <Widget>[
                       Row(children: [
-                        IconButton(
-                            icon: const Icon(
-                              Icons.hiking,
-                              color: Colors.green,
-                              size: 40,
-                            ),
-                            onPressed: () =>
-                                {startWorkout(context, ExerciseType.walking)}),
-                        IconButton(
+                        StartExerciseButton(
+                          icon: const Icon(
+                            Icons.hiking,
+                            color: Colors.green,
+                            size: 40,
+                          ),
+                          onPressed: () => {
+                            startWorkout(context, ExerciseType.walking)
+                          },
+                          name: "StartWalkButton"
+                        ),
+                        StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_run,
                               color: Colors.green,
                               size: 40,
                             ),
-                            onPressed: () =>
-                                {startWorkout(context, ExerciseType.running)}),
-                        IconButton(
+                            onPressed: () => {
+                              startWorkout(context, ExerciseType.running)
+                            },
+                            name: "StartRunButton"
+                        ),
+                        StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_bike,
                               color: Colors.green,
                               size: 40,
                             ),
-                            onPressed: () =>
-                                {startWorkout(context, ExerciseType.biking)}),
+                            onPressed: () => {
+                              startWorkout(context, ExerciseType.biking)
+                            },
+                            name: "StartBikeButton"
+                        ),
                       ]),
                       const SizedBox(height: 5),
                       RoundedButton(
@@ -105,8 +115,8 @@ class TargetHeartRateScreen extends StatefulWidget {
 }
 
 class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
-  TextEditingController _heartRateController = TextEditingController();
-  TextEditingController _ageController = TextEditingController();
+  final TextEditingController _heartRateController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +127,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               const Text("Enter Target Heart\n Rate Or Age",
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white)),
@@ -129,7 +139,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                         padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                         child: TextField(
                           controller: _heartRateController,
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
                             labelText: "Target Heart Rate",
                             labelStyle: TextStyle(color: Colors.blueAccent),
@@ -150,7 +160,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                         padding: const EdgeInsets.fromLTRB(50, 0, 50, 0),
                         child: TextField(
                           controller: _ageController,
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
                             labelText: "Age",
                             labelStyle: TextStyle(color: Colors.blueAccent),
@@ -168,18 +178,18 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.symmetric(horizontal: 10),
+                        margin: const EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
                             onPressed: () async {
                               // Do input validation and then write the shared prefs
                               int? heartRate = int.tryParse(_heartRateController.text);
                               int? age = int.tryParse(_ageController.text);
                               if(age == null && heartRate == null) return;
-                              int result = heartRate != null ? heartRate : (208 - 0.7*age!.toDouble()).toInt();
+                              int result = heartRate ?? (208 - 0.7*age!.toDouble()).toInt();
                               final sharedPreferences = await SharedPreferences.getInstance();
                               await sharedPreferences.setInt("target_heart_rate", result);
-                              Navigator.pop(context);
-                            }, child: Text("Confirm")),
+                              if(context.mounted) Navigator.pop(context);
+                            }, child: const Text("Confirm")),
                       ),
                     ],
                   ),

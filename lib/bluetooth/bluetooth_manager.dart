@@ -24,20 +24,17 @@ class BluetoothManager {
   /// Maps bluetooth connection id to stream subscription
   final Map<int, StreamSubscription> _subscriptions = {};
 
-  /// Device data that will be broadcasted
+  /// Device data that will be broadcast
   final Map<int, Map<String, String>> _deviceData = {};
 
   /// StreamController for the device data
   final StreamController<Map<int, Map<String, String>>>
       _deviceDataStreamController = StreamController.broadcast();
 
+  static final log = Logger("bluetooth_manager");
+
   /// Private constructor
-  BluetoothManager._() {
-    Logger.root.level = Level.ALL; // defaults to Level.INFO
-    Logger.root.onRecord.listen((record) {
-      print('${record.level.name}: ${record.time}: ${record.message}');
-    });
-  }
+  BluetoothManager._();
 
   Map<int, Map<String, String>> get deviceData {
     return _deviceData;
@@ -52,7 +49,7 @@ class BluetoothManager {
     try {
       return FlutterBluetoothSerial.instance.startDiscovery();
     } catch (e) {
-      Logger.root.severe("Error starting device discovery: $e");
+      log.severe("Error starting device discovery: $e");
       throw ('Error starting device discovery: $e');
     }
   }
@@ -100,7 +97,7 @@ class BluetoothManager {
       sendPersonalInfo();
       return true;
     } catch (e) {
-      Logger.root.severe('Error connecting to device: $e');
+      log.severe('Error connecting to device: $e');
       return false;
     }
   }
@@ -129,7 +126,7 @@ class BluetoothManager {
       sendPersonalInfo();
       return true;
     } catch (e) {
-      Logger.root.severe('Error connecting to device: $e');
+      log.severe('Error connecting to device: $e');
       return false;
     }
   }
@@ -142,7 +139,7 @@ class BluetoothManager {
       _deviceData.remove(id);
       _subscriptions[id]?.cancel();
     } catch (e) {
-      Logger.root.severe('Error disconnecting from device: $e');
+      log.severe('Error disconnecting from device: $e');
     }
   }
 
@@ -151,7 +148,7 @@ class BluetoothManager {
     // Create encoded string
     String? mac = await FlutterBluetoothSerial.instance.address;
     if (mac == null) {
-      Logger.root.severe("Device MAC address is null!");
+      log.severe("Device MAC address is null!");
       return;
     }
     String dataString = mac;
@@ -170,27 +167,26 @@ class BluetoothManager {
         if (!connection.isConnected) {
           disconnectFromDevice(id);
         }
-        Logger.root.info("Sending string via bluetooth: $str");
+        log.info("Sending string via bluetooth: $str");
         connection.output.add(ascii.encode(str));
       } catch (e) {
-        Logger.root.severe(e);
+        log.severe(e);
       }
     }
   }
 
   /// Update device data from connected devices
   /// Format for device data
-  ///  - Data should be a string encoded as Uint8List
-  ///  - All values should be separated by ":" (this will be the delimeter)
+  ///  - Data should be a string encoded as UInt8List
+  ///  - All values should be separated by ":" (this will be the delimiter)
   ///  - All other values will be pairs of keys and values
   Future<void> updateDeviceData(int id, Uint8List data) async {
     List<String> list = ascii.decode(data).split(':');
     if (list.isEmpty) {
-      Logger.root
-          .severe("Received device data that was empty or not decodeable");
+      log.severe("Received device data that was empty or was not able to be decoded");
     }
     if (list.length % 2 != 0) {
-      Logger.root.severe("Received device data was of odd length");
+      log.severe("Received device data was of odd length");
     }
 
     for (int i = 0; i < list.length; i += 2) {
@@ -214,7 +210,7 @@ class BluetoothManager {
     ].request();
   }
 
-  /// Sends personal info to connected devices needed for identfication
+  /// Sends personal info to connected devices needed for identification
   Future<void> sendPersonalInfo() async {
     // Get Name
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -227,7 +223,7 @@ class BluetoothManager {
     String? serialNum = deviceInfo.serialNumber;
 
     // Send to devices
-    String str = "name:{$name}:device_id:${deviceId}:serial_number:${serialNum}";
+    String str = "name:{$name}:device_id:$deviceId:serial_number:$serialNum";
     broadcastString(str);
   }
 

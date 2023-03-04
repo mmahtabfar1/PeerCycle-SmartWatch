@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:peer_cycle/logging/fit_activity_logger.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
-
-import '../logging/workout_logger.dart';
+import 'package:peer_cycle/logging/workout_logger.dart';
 
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
@@ -19,6 +19,7 @@ class PersonalWorkoutScreen extends StatefulWidget {
 
   final Workout workout;
   final ExerciseType exerciseType;
+  static final log = Logger("personal_workout_screen");
 
   @override
   State<PersonalWorkoutScreen> createState() => _PersonalWorkoutScreenState();
@@ -111,7 +112,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     String currentTime = DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
     String appDocumentsDirectory = (await getApplicationDocumentsDirectory()).path;
     String fitFilePath = "$appDocumentsDirectory/workout@$currentTime.fit";
-    print("fitFilePath: $fitFilePath");
+    PersonalWorkoutScreen.log.info("fitFilePath: $fitFilePath");
     await FitActivityLogger.writeFitFile(fitFilePath, readings, exerciseType);
   }
 

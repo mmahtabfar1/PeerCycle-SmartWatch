@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'partner.dart';
 import 'package:workout/workout.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Workout {
   ExerciseType exerciseType;
@@ -37,7 +38,7 @@ class Workout {
   }
 
   /// Serialize the workout as a JSON string
-  Map<String, dynamic> toJson() {
+  Future<Map<String, dynamic>> toJson() async {
     int? end =  endTimestamp?.millisecondsSinceEpoch;
     if(end != null) end = end ~/ 1000;
     Map<String, dynamic> map = {
@@ -46,7 +47,7 @@ class Workout {
       'start_timestamp': startTimestamp.millisecondsSinceEpoch ~/ 1000,
       'end_timestamp': end,
     };
-    map.addEntries(_metricsToJson());
+    map.addEntries(await _metricsToJson());
     return map;
   }
 
@@ -57,7 +58,7 @@ class Workout {
     };
   }
 
-  List<MapEntry<String, dynamic>> _metricsToJson() {
+  Future<List<MapEntry<String, dynamic>>> _metricsToJson() async {
     List<MapEntry<String, dynamic>> output = [];
 
     for(WorkoutFeature key in metrics.keys) {
@@ -69,6 +70,13 @@ class Workout {
         "units": _getUnitForMetricName(key),
         "data": data
       };
+
+      //add target heartRate if the WorkoutFeature is heart rate
+      if(key == WorkoutFeature.heartRate) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        map["target_heart_rate"] = prefs.get("target_heart_rate");
+      }
+
       output.add(MapEntry(_getMetricNameForJson(key), map));
     }
 
@@ -77,11 +85,11 @@ class Workout {
 
   String _getUnitForMetricName(WorkoutFeature feature) {
     Map<WorkoutFeature, String> map = {
-      WorkoutFeature.heartRate: "bpm",
-      WorkoutFeature.calories: "kcal",
-      WorkoutFeature.distance: "m",
+      WorkoutFeature.heartRate: "beats_per_minute",
+      WorkoutFeature.calories: "kilocalories",
+      WorkoutFeature.distance: "meters",
       WorkoutFeature.steps: "steps",
-      WorkoutFeature.speed: "km/h"
+      WorkoutFeature.speed: "kilometers_per_hour"
     };
     return map[feature] ?? "unknown";
   }

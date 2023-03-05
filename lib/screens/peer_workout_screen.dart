@@ -32,12 +32,13 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   int calories = 0; //change to time
   int steps = 0;
   int speed = 0;
-  Duration _timer = Duration.zero;
+  Duration _duration = Duration.zero;
+  late Timer _timer;
 
   void startTimer(){
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _timer += const Duration(seconds: 1);
+        _duration += const Duration(seconds: 1);
       });
     });
   }
@@ -52,6 +53,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 
   final List<WorkoutReading> readings = [];
   late StreamSubscription<WorkoutReading> workoutStreamSubscription;
+  late StreamSubscription<Map<int, Map<String, String>>> bluetoothStreamSubscription;
 
   @override
   void initState() {
@@ -87,8 +89,16 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     });
   }
 
+  @override
+  void dispose() async {
+    super.dispose();
+    _timer.cancel();
+    await workoutStreamSubscription.cancel();
+    await bluetoothStreamSubscription.cancel();
+  }
+
   _PeerWorkoutScreenState() {
-    BluetoothManager.instance.deviceDataStream.listen((event) {
+    bluetoothStreamSubscription = BluetoothManager.instance.deviceDataStream.listen((event) {
       final map = event.values.first;
 
       for(final key in map.keys) {
@@ -204,7 +214,7 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                               children: [
                 
                                 Text(
-                                  _timer.toString().split('.').first.padLeft(8, "0"),
+                                  _duration.toString().split('.').first.padLeft(8, "0"),
                                   style: const TextStyle(color: Colors.white, fontSize: 25),
                                 ),
                               ]),

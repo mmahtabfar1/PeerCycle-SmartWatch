@@ -35,12 +35,13 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   int steps = 0;
   int distance = 0;
   int speed = 0;
-  Duration _timer = Duration.zero;
+  Duration _duration = Duration.zero;
+  late Timer _timer;
 
   void startTimer(){
-    Timer.periodic(const Duration(seconds: 1), (timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _timer += const Duration(seconds: 1);
+        _duration += const Duration(seconds: 1);
       });
     });
   }
@@ -95,6 +96,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   @override
   void dispose() async {
     super.dispose();
+    _timer.cancel();
     stopWorkout();
     await workoutStreamSubscription.cancel();
     writeFitFile();
@@ -161,7 +163,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     color: Colors.lightGreen,
                   ),
                   Text(
-                    _timer.toString().split('.').first.padLeft(8, "0"),
+                    _duration.toString().split('.').first.padLeft(8, "0"),
                     style: const TextStyle(color: Colors.white, fontSize: 25),
                   ),
                 ]),

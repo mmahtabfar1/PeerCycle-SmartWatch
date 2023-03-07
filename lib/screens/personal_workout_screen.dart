@@ -10,6 +10,8 @@ import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 
+import '../logging/app_event.dart';
+
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
     super.key,
@@ -101,6 +103,11 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     await workoutStreamSubscription.cancel();
     writeFitFile();
     WorkoutLogger.instance.endWorkout();
+    WorkoutLogger.instance.addEvent({
+      "event_type": AppEvent.workoutEnded.value.toString(),
+      "workout_type": widget.exerciseType.toString(),
+      "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
+    });
   }
 
   void writeFitFile() async {

@@ -5,7 +5,19 @@ import 'package:peer_cycle/screens/start_screen.dart';
 import 'package:wear/wear.dart';
 import 'package:logging/logging.dart';
 
-void main() => runApp(MyApp());
+import 'logging/app_event.dart';
+import 'logging/workout_logger.dart';
+
+void main() {
+  //event logging
+
+  WorkoutLogger.instance.addEvent({
+    "event_type": AppEvent.appLaunched.value.toString(),
+    "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
+  });
+
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   MyApp({super.key}) {

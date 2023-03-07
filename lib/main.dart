@@ -5,8 +5,9 @@ import 'package:peer_cycle/screens/start_screen.dart';
 import 'package:wear/wear.dart';
 import 'package:logging/logging.dart';
 
-import 'logging/app_event.dart';
-import 'logging/workout_logger.dart';
+import 'package:peer_cycle/logging/app_event.dart';
+import 'package:peer_cycle/logging/upload_manager.dart';
+import 'package:peer_cycle/logging/workout_logger.dart';
 
 void main() {
   //event logging
@@ -15,6 +16,11 @@ void main() {
     "event_type": AppEvent.appLaunched.value.toString(),
     "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
   });
+
+  //start the listener to synchronize un uploaded log files
+  //when network status changes
+  WidgetsFlutterBinding.ensureInitialized();
+  UploadManager.instance.init();
 
   runApp(MyApp());
 }

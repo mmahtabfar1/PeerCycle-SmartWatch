@@ -9,11 +9,14 @@ import 'package:path_provider/path_provider.dart';
 class UploadManager {
   static final log = Logger("workout_logger");
 
-  static StreamSubscription<ConnectivityResult>? _subscription;
+  static final UploadManager _instance = UploadManager._();
+  static UploadManager get instance => _instance;
 
-  static UploadManager instance = UploadManager._();
-  UploadManager._() {
-    _subscription = Connectivity().onConnectivityChanged.listen((event) {
+  UploadManager._();
+
+  void init() {
+    Connectivity().onConnectivityChanged.listen((event) {
+      log.info("got event ${event.name}");
       if (event == ConnectivityResult.wifi || event == ConnectivityResult.mobile) {
         _syncUnuploadedFiles();
       }
@@ -46,8 +49,9 @@ class UploadManager {
   void _syncUnuploadedFiles() async {
     String appDocumentsDirectory =
           (await getApplicationDocumentsDirectory()).path;
-    Directory unuploadedDir = Directory("$appDocumentsDirectory/unuploaded");
+    Directory unuploadedDir = await Directory("$appDocumentsDirectory/unuploaded").create(recursive: true);
     List<FileSystemEntity> entities = await unuploadedDir.list().toList();
+    log.info("there are ${entities.length} files that need to be synced");
     for(FileSystemEntity entity in entities) {
       if(entity is! File) {
         continue;
@@ -57,6 +61,10 @@ class UploadManager {
       bool result = await _uploadWorkout(json);
       if(result) {
         String filename = file.path.substring(file.path.lastIndexOf("/"));
+
+        //create uploaded directory if it doesn't exist
+        await Directory("$appDocumentsDirectory/uploaded").create(recursive: true);
+
         file.rename("$appDocumentsDirectory/uploaded$filename");
       }
     }

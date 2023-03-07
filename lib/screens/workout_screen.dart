@@ -82,6 +82,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     WorkoutLogger.instance.deviceId = deviceInfo.id;
     WorkoutLogger.instance.serialNum = deviceInfo.serialNumber;
     //TODO: add the user's name to the WorkoutLogger here
+    WorkoutLogger.instance.addEvent({
+      "event_type": AppEvent.workoutStarted.value.toString(),
+      "workout_type": widget.exerciseType.toString(),
+      "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
+    });
     WorkoutLogger.instance.startWorkout(widget.exerciseType);
     return workout.start(
       exerciseType: widget.exerciseType,

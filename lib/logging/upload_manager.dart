@@ -42,7 +42,15 @@ class UploadManager {
           (await getApplicationDocumentsDirectory()).path;
     File file = File("$appDocumentsDirectory/unuploaded/$filename.json");
     String json = await file.readAsString();
-    await _uploadWorkout(json);
+    bool result = await _uploadWorkout(json);
+    if(result) {
+      String filename = file.path.substring(file.path.lastIndexOf("/"));
+
+      //create uploaded directory if it doesn't exist
+      await Directory("$appDocumentsDirectory/uploaded").create(recursive: true);
+
+      file.rename("$appDocumentsDirectory/uploaded$filename");
+    }
     return true;
   }
 

@@ -20,3 +20,8 @@ Size getWatchScreenSize(BuildContext context) {
   }
   return screenSize;
 }
+
+//convert speed from meters per second to kilometers per hour
+double mpsToKph(double speed) {
+  return speed * 3.6;
+}

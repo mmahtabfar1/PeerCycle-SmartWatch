@@ -9,6 +9,7 @@ import 'package:peer_cycle/logging/fit_activity_logger.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
+import 'package:peer_cycle/utils.dart';
 
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
@@ -84,10 +85,11 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           BluetoothManager.instance.broadcastString("distance:${reading.value}");
           break;
         case WorkoutFeature.speed:
+          double speedInKph = mpsToKph(reading.value);
           setState(() {
-            speed = reading.value.toInt();
+            speed = speedInKph.toInt();
           });
-          BluetoothManager.instance.broadcastString("speed:${reading.value}");
+          BluetoothManager.instance.broadcastString("speed:$speedInKph");
           break;
       }
     });

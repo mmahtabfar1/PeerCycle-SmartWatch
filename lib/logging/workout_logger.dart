@@ -8,6 +8,7 @@ import 'package:peer_cycle/secrets/secrets.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/logging/workout.dart';
 import 'package:workout/workout.dart' hide Workout;
+import 'package:peer_cycle/utils.dart';
 
 class WorkoutLogger {
   Workout? workout;
@@ -23,7 +24,19 @@ class WorkoutLogger {
   static final log = Logger("workout_logger");
 
   void logMetric(WorkoutReading reading) {
-    workout?.addMetric(reading);
+    //if logging a speed metric convert value from m/s to km/h
+    if(reading.feature == WorkoutFeature.speed) {
+      workout?.addMetric(
+          WorkoutReading(
+            WorkoutFeature.speed,
+            mpsToKph(reading.value),
+            reading.timestamp.millisecondsSinceEpoch
+          )
+      );
+    }
+    else {
+      workout?.addMetric(reading);
+    }
   }
 
   void startWorkout(ExerciseType exerciseType) {

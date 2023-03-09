@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:logging/logging.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
-import 'dart:async';
+import 'package:peer_cycle/utils.dart';
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
@@ -81,8 +83,9 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
           });
           break;
         case WorkoutFeature.speed:
+          double speedInKph = mpsToKph(reading.value);
           setState(() {
-            indivSpeed = reading.value.toInt();
+            indivSpeed = speedInKph.toInt();
           });
           break;
       }

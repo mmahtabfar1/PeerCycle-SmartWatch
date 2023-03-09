@@ -16,7 +16,12 @@ class StartExerciseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color.fromRGBO(91, 91, 91, 1),
+        shape: BoxShape.circle,
+      ),
+      child: IconButton(
         icon: icon,
         onPressed: () {
           //log that the button was pressed
@@ -27,6 +32,7 @@ class StartExerciseButton extends StatelessWidget {
           });
           onPressed();
         },
+      )
     );
   }
 }

@@ -46,29 +46,28 @@ class StartScreen extends StatelessWidget {
                           icon: const Icon(
                             Icons.hiking,
                             color: Colors.green,
-                            size: 40,
                           ),
                           onPressed: () => {
                             startWorkout(context, ExerciseType.walking)
                           },
                           name: "StartWalkButton"
                         ),
+                        const SizedBox(width: 10),
                         StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_run,
                               color: Colors.green,
-                              size: 40,
                             ),
                             onPressed: () => {
                               startWorkout(context, ExerciseType.running)
                             },
                             name: "StartRunButton"
                         ),
+                        const SizedBox(width: 10),
                         StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_bike,
                               color: Colors.green,
-                              size: 40,
                             ),
                             onPressed: () => {
                               startWorkout(context, ExerciseType.biking)
@@ -78,7 +77,7 @@ class StartScreen extends StatelessWidget {
                       ]),
                       const SizedBox(height: 5),
                       RoundedButton(
-                        text: "Settings",
+                        name: "SettingsButton",
                         width: screenSize.width,
                         height: 40,
                         onPressed: () => {
@@ -87,9 +86,13 @@ class StartScreen extends StatelessWidget {
                               MaterialPageRoute(
                                   builder: (context) => const SettingsScreen()))
                         },
+                        child: const Text(
+                          "Settings",
+                          style: TextStyle(color: Colors.white),
+                        )
                       ),
                       RoundedButton(
-                        text: "Connect Peers",
+                        name: "ConnectPeersButton",
                         width: screenSize.width,
                         height: 40,
                         onPressed: () => {
@@ -100,6 +103,10 @@ class StartScreen extends StatelessWidget {
                                     const ConnectPeersScreen()),
                           )
                         },
+                        child: const Text(
+                          "Connect Peers",
+                          style: TextStyle(color: Colors.white),
+                        )
                       ),
                     ])));
           },

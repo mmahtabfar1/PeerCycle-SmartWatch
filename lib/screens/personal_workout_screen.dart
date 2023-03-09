@@ -208,13 +208,16 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 55),
               child: RoundedButton(
-                text: "End Workout",
+                name: "EndWorkoutButton",
                 width: 1,
                 height: 40,
                 onPressed: () {
                   stopWorkout();
                   Navigator.pop(context);
                 },
+                child: const Text("End Workout",
+                    style: TextStyle(color: Colors.white)
+                ),
               ),
             )
           ],

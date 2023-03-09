@@ -3,17 +3,21 @@ import 'package:peer_cycle/logging/app_event.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 
 class RoundedButton extends StatelessWidget {
+  final String name;
   final double height;
   final double width;
-  final String text;
+  final Widget child;
+  final Color color;
   final void Function() onPressed;
 
   const RoundedButton({
     super.key,
-    required this.height,
-    required this.width,
-    required this.text,
+    required this.name,
+    required this.child,
     required this.onPressed,
+    this.height = 0,
+    this.width = 0,
+    this.color = const Color.fromRGBO(91, 91, 91, 1),
   });
 
   @override
@@ -23,14 +27,14 @@ class RoundedButton extends StatelessWidget {
         //log that this button was pressed
         WorkoutLogger.instance.addEvent({
           "event_type": AppEvent.buttonPressed.value.toString(),
-          "button_name": "${text.replaceAll(" ", "")}Button",
+          "button_name": name.replaceAll(" ", ""),
           "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
         });
         onPressed();
       },
       style: ElevatedButton.styleFrom(
         minimumSize: Size(width, height),
-        backgroundColor: const Color.fromRGBO(91, 91, 91, 1),
+        backgroundColor: color,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15)
         )
@@ -38,11 +42,7 @@ class RoundedButton extends StatelessWidget {
       child: Center(
           widthFactor: null,
           heightFactor: null,
-          child: Text(
-              text,
-              style: const TextStyle(
-              color: Color.fromRGBO(255, 255, 255, 1))
-          )
+          child: child,
       ),
     );
   }

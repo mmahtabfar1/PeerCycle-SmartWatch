@@ -16,6 +16,10 @@ class BluetoothManager {
   static final BluetoothManager _instance = BluetoothManager._();
   static BluetoothManager get instance => _instance;
 
+  /// if we are currently attempting a connection
+  bool get connecting => _connecting;
+  bool _connecting = false;
+
   int lastConnectionId = 0;
 
   /// Maps bluetooth connection id to its connection
@@ -70,6 +74,7 @@ class BluetoothManager {
   /// Returns boolean on whether or not a connection was established
   Future<bool> connectToDevice(BluetoothDevice device) async {
     try {
+      _connecting = true;
       // Check if device is already connected
       if (device.isConnected) {
         throw Exception("Device already connected!");
@@ -95,8 +100,10 @@ class BluetoothManager {
       }
       lastConnectionId++;
       sendPersonalInfo();
+      _connecting = false;
       return true;
     } catch (e) {
+      _connecting = false;
       log.severe('Error connecting to device: $e');
       return false;
     }
@@ -106,6 +113,7 @@ class BluetoothManager {
   /// Returns boolean on whether or not a connection was established
   Future<bool> listenForConnections(String sdpName, int timeout) async {
     try {
+      _connecting = true;
       // Connect the device
       BluetoothConnection connection =
           await BluetoothConnection.listenForConnections(sdpName, timeout);
@@ -123,9 +131,11 @@ class BluetoothManager {
         _subscriptions[lastConnectionId] = subscription;
       }
       lastConnectionId++;
+      _connecting = false;
       sendPersonalInfo();
       return true;
     } catch (e) {
+      _connecting = false;
       log.severe('Error connecting to device: $e');
       return false;
     }

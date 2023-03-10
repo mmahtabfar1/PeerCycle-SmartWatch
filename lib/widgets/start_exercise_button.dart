@@ -21,6 +21,7 @@ class StartExerciseButton extends StatelessWidget {
         color: Color.fromRGBO(91, 91, 91, 1),
         shape: BoxShape.circle,
       ),
+      width: 45,
       child: IconButton(
         icon: icon,
         onPressed: () {

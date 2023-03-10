@@ -52,7 +52,7 @@ class StartScreen extends StatelessWidget {
                           },
                           name: "StartWalkButton"
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 5),
                         StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_run,
@@ -63,7 +63,7 @@ class StartScreen extends StatelessWidget {
                             },
                             name: "StartRunButton"
                         ),
-                        const SizedBox(width: 10),
+                        const SizedBox(width: 5),
                         StartExerciseButton(
                             icon: const Icon(
                               Icons.directions_bike,

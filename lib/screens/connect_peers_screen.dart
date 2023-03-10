@@ -34,7 +34,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               SizedBox(
-                width: 195,
+                width: 150,
                 height: 50,
                 child: RoundedButton(
                     name: "StartBluetoothServerButton",
@@ -49,14 +49,14 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                     child: Row(
                       children: const <Widget>[
                         Icon(Icons.bluetooth_searching),
-                        Text("Start Bluetooth Server", style: TextStyle(color: Colors.white)),
+                        Text("Bluetooth Server", style: TextStyle(color: Colors.white)),
                       ],
                     )
                 ),
               ),
               const SizedBox(height: 18),
               SizedBox(
-                width: 195,
+                width: 150,
                 height: 50,
                 child: RoundedButton(
                     name: "ScanForBluetoothServersButton",

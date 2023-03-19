@@ -193,10 +193,18 @@ class BluetoothManager {
   Future<void> updateDeviceData(int id, Uint8List data) async {
     List<String> list = ascii.decode(data).split(':');
     if (list.isEmpty) {
-      log.severe("Received device data that was empty or was not able to be decoded");
+      Logger.root
+          .severe("Received device data that was empty or not decodeable");
+      return;
     }
+
+    if (list.last.isEmpty) {
+      list.removeLast();
+    }
+
     if (list.length % 2 != 0) {
-      log.severe("Received device data was of odd length");
+      Logger.root.severe("Received device data was of odd length");
+      return;
     }
 
     for (int i = 0; i < list.length; i += 2) {

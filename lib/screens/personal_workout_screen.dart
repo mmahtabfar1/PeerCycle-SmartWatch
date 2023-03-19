@@ -66,32 +66,32 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           setState(() {
             heartRate = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("heartRate:${reading.value}");
+          BluetoothManager.instance.broadcastString("heartRate:${reading.value}:");
           break;
         case WorkoutFeature.calories:
           setState(() {
             calories = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("calories:${reading.value}");
+          BluetoothManager.instance.broadcastString("calories:${reading.value}:");
           break;
         case WorkoutFeature.steps: //change to time.
           setState(() {
             steps = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("steps:${reading.value}");
+          BluetoothManager.instance.broadcastString("steps:${reading.value}:");
           break;
         case WorkoutFeature.distance:
           setState(() {
             distance = reading.value.toInt();
           });
-          BluetoothManager.instance.broadcastString("distance:${reading.value}");
+          BluetoothManager.instance.broadcastString("distance:${reading.value}:");
           break;
         case WorkoutFeature.speed:
           double speedInKph = mpsToKph(reading.value);
           setState(() {
             speed = speedInKph.toInt();
           });
-          BluetoothManager.instance.broadcastString("speed:$speedInKph");
+          BluetoothManager.instance.broadcastString("speed:$speedInKph:");
           break;
       }
     });

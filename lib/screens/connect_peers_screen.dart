@@ -35,7 +35,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
             children: <Widget>[
               SizedBox(
                 width: 150,
-                height: 50,
+                height: 40,
                 child: RoundedButton(
                     name: "StartBluetoothServerButton",
                     color: Colors.lightBlue,
@@ -54,10 +54,10 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                     )
                 ),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 12),
               SizedBox(
                 width: 150,
-                height: 50,
+                height: 40,
                 child: RoundedButton(
                     name: "ScanForBluetoothServersButton",
                     color: Colors.lightBlue,
@@ -74,6 +74,13 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                       ],
                     )
                 ),
+              ),
+              
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40),
+                child: RoundedButton(name: "exit_button", child: Text("Exit"), onPressed: (){
+                  Navigator.pop(context);
+                }),
               )
             ]
         )

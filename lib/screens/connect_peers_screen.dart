@@ -114,13 +114,15 @@ class ScanningScreen extends StatefulWidget {
 class _ScanningScreenState extends State<ScanningScreen> {
   Stream<BluetoothDiscoveryResult>? discoveryStream;
   StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
-  List<Widget> devices = [];
+  //map device name to its widget
+  Map<String, Widget> devices = {};
 
   _ScanningScreenState() {
     discoveryStream = BluetoothManager.instance.startDeviceDiscovery();
     discoveryStreamSubscription = discoveryStream?.listen((event) {
       setState(() {
         if (event.device.name == null || event.device.isConnected) return;
+        if (devices.containsKey(event.device.name)) return;
         final textWidget = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
           child: RoundedButton(
@@ -143,7 +145,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
               ),
           ),
         );
-        devices = [...devices, textWidget];
+        devices[event.device.name!] = textWidget;
       });
     });
   }
@@ -167,7 +169,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
         builder: (context, shape, widget) {
           return ListView(
             padding: const EdgeInsets.only(top: 40, bottom: 40),
-            children: devices,
+            children: devices.values.toList(growable: false),
           );
         },
       ),

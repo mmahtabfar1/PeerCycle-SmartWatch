@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
+import 'package:peer_cycle/screens/connect_device_screen.dart';
 
 class ConnectPeersScreen extends StatefulWidget {
   const ConnectPeersScreen({super.key});
@@ -113,11 +114,9 @@ class ScanningScreen extends StatefulWidget {
 class _ScanningScreenState extends State<ScanningScreen> {
   Stream<BluetoothDiscoveryResult>? discoveryStream;
   StreamSubscription<BluetoothDiscoveryResult>? discoveryStreamSubscription;
-  late FToast fToast;
   List<Widget> devices = [];
 
   _ScanningScreenState() {
-    fToast = FToast();
     discoveryStream = BluetoothManager.instance.startDeviceDiscovery();
     discoveryStreamSubscription = discoveryStream?.listen((event) {
       setState(() {
@@ -128,47 +127,16 @@ class _ScanningScreenState extends State<ScanningScreen> {
               name: "ConnectToBluetoothDeviceButton",
               height: 40,
               width: 40,
-              onPressed: () async {
+              onPressed: () {
                 if (BluetoothManager.instance.connecting) return;
-                bool result =
-                    await BluetoothManager.instance.connectToDevice(event.device);
 
-                // Make toast
-                Color color = result ? Colors.greenAccent : Colors.redAccent;
-                String text = result ? "Connected!" : "Couldn't Connect!";
-                Color textColor = result ? Colors.black : Colors.white;
-                Icon icon = result
-                    ? Icon(Icons.check, color: textColor)
-                    : Icon(Icons.close, color: textColor);
-        
-                Widget toast = Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 2.0, vertical: 12.0),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(25.0),
-                    color: color,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      icon,
-                      const SizedBox(
-                        width: 12.0,
-                      ),
-                      Text(text, style: TextStyle(color: textColor)),
-                    ],
-                  ),
+                //replace this screen with the connect device screen
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ConnectDeviceScreen(bluetoothDevice: event.device)
+                  )
                 );
-                // Show Toast
-                fToast.showToast(
-                    child: toast,
-                    gravity: ToastGravity.TOP,
-                    toastDuration: const Duration(seconds: 2));
-        
-                // Exit if connected
-                if (result && context.mounted) {
-                  Navigator.pop(context);
-                }
               },
               child: Text(event.device.name!,
                   style: const TextStyle(color: Colors.white)
@@ -182,7 +150,6 @@ class _ScanningScreenState extends State<ScanningScreen> {
 
   @override
   Widget build(BuildContext context) {
-    fToast.init(context);
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
@@ -255,7 +222,7 @@ class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
         //and pop back to previous screen
         if (snapshot.hasData) {
           bool result = snapshot.data!;
-          String text = result ? "Connected!" : "No Connection Recevied!";
+          String text = result ? "Connected!" : "No Connection Received!";
           IconData icon = result ? Icons.check_circle : Icons.cancel;
           Color color = result ? Colors.green : Colors.red;
           return Scaffold(

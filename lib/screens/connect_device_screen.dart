@@ -26,7 +26,10 @@ class ConnectDeviceScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  Text("Connecting to $deviceName", style: const TextStyle(color: Colors.white)),
+                  SizedBox(
+                    width: 150,
+                    child: Text("Connecting to $deviceName", style: const TextStyle(color: Colors.white)),
+                  ),
                   const SizedBox(height: 10),
                   const CircularProgressIndicator(),
                 ]

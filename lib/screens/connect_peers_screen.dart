@@ -235,18 +235,36 @@ class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
                 children: <Widget>[
                   Text(text, style: const TextStyle(color: Colors.white)),
                   Icon(icon, color: color, size: 60),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 5),
                   SizedBox(
                     height: 30,
-                    width: 100,
+                    width: 120,
                     child: RoundedButton(
-                      name: "DismissButton",
+                      name: "ConnectAgainButton",
                       height: 30,
                       width: 100,
                       onPressed: () {
-                        Navigator.of(context).pop();
+                        Navigator.pop(context);
                       },
-                      child: const Text("Dismiss",
+                      child: const Text("Connect Again",
+                          style: TextStyle(color: Colors.white)
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  SizedBox(
+                    height: 30,
+                    width: 120,
+                    child: RoundedButton(
+                      name: "GoHomeButton",
+                      height: 30,
+                      width: 100,
+                      onPressed: () {
+                        final nav = Navigator.of(context);
+                        nav.pop();
+                        nav.pop();
+                      },
+                      child: const Text("Go Home",
                           style: TextStyle(color: Colors.white)
                       ),
                     ),

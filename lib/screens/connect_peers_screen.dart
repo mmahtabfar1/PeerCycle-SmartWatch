@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
 import 'package:wear/wear.dart';
 import 'package:peer_cycle/utils.dart';
@@ -193,7 +192,6 @@ class BluetoothServerScreen extends StatefulWidget {
 class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
   final int discoverabilityTimeout = 30;
   final int serverTimeout = 30;
-  FToast fToast = FToast();
   final CountDownController _countDownController = CountDownController();
 
   //Logger
@@ -216,12 +214,9 @@ class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    fToast.init(context);
     return FutureBuilder<bool>(
       future: startBluetoothServer(),
       builder: (context, snapshot) {
-        //once we have the result make the toast if success or failure,
-        //and pop back to previous screen
         if (snapshot.hasData) {
           bool result = snapshot.data!;
           String text = result ? "Connected!" : "No Connection Received!";

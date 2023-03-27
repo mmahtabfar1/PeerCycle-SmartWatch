@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:screen_state/screen_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wear/wear.dart';
 import 'package:workout/workout.dart';
 import 'package:flutter/material.dart';
@@ -79,9 +80,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Future<WorkoutStartResult> startWorkout() async {
     AndroidDeviceInfo deviceInfo = await deviceInfoPlugin.androidInfo;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     WorkoutLogger.instance.deviceId = deviceInfo.id;
     WorkoutLogger.instance.serialNum = deviceInfo.serialNumber;
-    //TODO: add the user's name to the WorkoutLogger here
+    WorkoutLogger.instance.userName = prefs.getString("name") ?? "Unknown";
     WorkoutLogger.instance.addEvent({
       "event_type": AppEvent.workoutStarted.value.toString(),
       "workout_type": widget.exerciseType.toString(),

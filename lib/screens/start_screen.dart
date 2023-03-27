@@ -194,6 +194,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                               if(age == null && heartRate == null) return;
                               int result = heartRate ?? (208 - 0.7*age!.toDouble()).toInt();
                               final sharedPreferences = await SharedPreferences.getInstance();
+                              await sharedPreferences.setInt("age", age!);
                               await sharedPreferences.setInt("target_heart_rate", result);
                               if(context.mounted) Navigator.pop(context);
                             }, child: const Text("Confirm")),

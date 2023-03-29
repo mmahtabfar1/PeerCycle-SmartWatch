@@ -71,16 +71,21 @@ class FitActivityLogger {
       for (final reading in entry.value) {
         switch(reading.feature) {
           case WorkoutFeature.heartRate:
-            msg.heartRate = reading.value.toInt();
+            msg.heartRate = int.tryParse(reading.value);
             break;
           case WorkoutFeature.calories:
-            msg.calories = reading.value.toInt();
+            msg.calories = int.tryParse(reading.value);
             break;
           case WorkoutFeature.distance:
-            msg.distance = reading.value;
+            msg.distance = double.tryParse(reading.value);
             break;
           case WorkoutFeature.speed:
-            msg.speed = reading.value;
+            msg.speed = double.tryParse(reading.value);
+            break;
+          case WorkoutFeature.location:
+            final latLngArr = reading.value.split('/');
+            msg.positionLat = double.tryParse(latLngArr[0]);
+            msg.positionLong = double.tryParse(latLngArr[1]);
             break;
           default:
             throw Exception("Invalid WorkoutFeature. Can't create RecordMessage for: $reading");

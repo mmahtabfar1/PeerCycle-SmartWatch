@@ -57,6 +57,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     super.initState();
     startTimer();
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
+      print("got a ${reading.feature.name} reading");
       WorkoutLogger.instance.logMetric(reading);
       readings.add(reading);
       switch(reading.feature) {
@@ -64,34 +65,37 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           return;
         case WorkoutFeature.heartRate:
           setState(() {
-            heartRate = reading.value.toInt();
+            heartRate = (double.tryParse(reading.value) ?? -1).toInt();
           });
           BluetoothManager.instance.broadcastString("heartRate:${reading.value}");
           break;
         case WorkoutFeature.calories:
           setState(() {
-            calories = reading.value.toInt();
+            calories = (double.tryParse(reading.value) ?? -1).toInt();
           });
           BluetoothManager.instance.broadcastString("calories:${reading.value}");
           break;
         case WorkoutFeature.steps: //change to time.
           setState(() {
-            steps = reading.value.toInt();
+            steps = (double.tryParse(reading.value) ?? -1).toInt();
           });
           BluetoothManager.instance.broadcastString("steps:${reading.value}");
           break;
         case WorkoutFeature.distance:
           setState(() {
-            distance = reading.value.toInt();
+            distance = (double.tryParse(reading.value) ?? -1).toInt();
           });
           BluetoothManager.instance.broadcastString("distance:${reading.value}");
           break;
         case WorkoutFeature.speed:
-          double speedInKph = mpsToKph(reading.value);
+          double speedInKph = mpsToKph(double.tryParse(reading.value) ?? -1.0);
           setState(() {
             speed = speedInKph.toInt();
           });
           BluetoothManager.instance.broadcastString("speed:$speedInKph");
+          break;
+        default:
+          print("GOT LOCATION DATA ${reading.value}");
           break;
       }
     });

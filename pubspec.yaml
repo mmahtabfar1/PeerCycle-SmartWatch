@@ -36,7 +36,10 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   wear: ^1.1.0
-  workout: ^0.6.0
+  workout:
+    git:
+      url: https://github.com/mmahtabfar1/flutter_workout.git
+      ref: master
   flutter_bluetooth_serial:
     git:
       url: https://github.com/JordanHanley/flutter_bluetooth_serial.git

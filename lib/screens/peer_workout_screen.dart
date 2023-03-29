@@ -69,24 +69,26 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
           return;
         case WorkoutFeature.heartRate:
           setState(() {
-            indivHeartRate = reading.value.toInt();
+            indivHeartRate = int.tryParse(reading.value) ?? -1;
           });
           break;
         case WorkoutFeature.calories:
           setState(() {
-            indivCalories = reading.value.toInt();
+            indivCalories = int.tryParse(reading.value) ?? -1;
           });
           break;
         case WorkoutFeature.distance:
           setState(() {
-            indivDistance = reading.value.toInt();
+            indivDistance = int.tryParse(reading.value) ?? -1;
           });
           break;
         case WorkoutFeature.speed:
-          double speedInKph = mpsToKph(reading.value);
+          double speedInKph = mpsToKph(double.tryParse(reading.value) ?? -1.0);
           setState(() {
             indivSpeed = speedInKph.toInt();
           });
+          break;
+        default:
           break;
       }
     });

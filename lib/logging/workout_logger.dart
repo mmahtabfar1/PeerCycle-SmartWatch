@@ -1,11 +1,8 @@
-import 'dart:io';
 import 'dart:convert';
 
 import 'package:logging/logging.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:peer_cycle/logging/partner.dart';
-import 'package:peer_cycle/secrets/secrets.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/logging/workout.dart';
 import 'package:workout/workout.dart' hide Workout;
 import 'package:peer_cycle/utils.dart';
@@ -30,7 +27,7 @@ class WorkoutLogger {
       workout?.addMetric(
           WorkoutReading(
             WorkoutFeature.speed,
-            mpsToKph(reading.value),
+            mpsToKph(double.tryParse(reading.value) ?? -1.0).toString(),
             reading.timestamp.millisecondsSinceEpoch
           )
       );

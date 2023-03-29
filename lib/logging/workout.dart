@@ -89,7 +89,8 @@ class Workout {
       WorkoutFeature.calories: "kilocalories",
       WorkoutFeature.distance: "meters",
       WorkoutFeature.steps: "steps",
-      WorkoutFeature.speed: "kilometers_per_hour"
+      WorkoutFeature.speed: "kilometers_per_hour",
+      WorkoutFeature.location: "latitude/longitude",
     };
     return map[feature] ?? "unknown";
   }
@@ -100,7 +101,8 @@ class Workout {
       WorkoutFeature.calories: "calories",
       WorkoutFeature.distance: "distance",
       WorkoutFeature.steps: "steps",
-      WorkoutFeature.speed: "speed"
+      WorkoutFeature.speed: "speed",
+      WorkoutFeature.location: "location",
     };
     return map[feature] ?? "unknown";
   }

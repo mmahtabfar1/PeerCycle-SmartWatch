@@ -28,6 +28,7 @@ class WorkoutScreen extends StatefulWidget {
     WorkoutFeature.steps,
     WorkoutFeature.distance,
     WorkoutFeature.speed,
+    WorkoutFeature.location,
   ];
 
   @override
@@ -122,6 +123,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         future: startWorkout(),
         builder: (context, snapshot) {
           if(snapshot.hasData) {
+            print("Unsupported features: ${snapshot.data!.unsupportedFeatures}");
             return Scaffold(
                 backgroundColor: Colors.black,
                 body: WatchShape(

@@ -13,7 +13,7 @@ void main() {
   //event logging
 
   WorkoutLogger.instance.addEvent({
-    "event_type": AppEvent.appLaunched.value.toString(),
+    "event_type": AppEvent.appLaunched.value,
     "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
   });
 

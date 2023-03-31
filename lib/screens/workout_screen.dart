@@ -86,7 +86,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     WorkoutLogger.instance.serialNum = deviceInfo.serialNumber;
     WorkoutLogger.instance.userName = prefs.getString("name") ?? "Unknown";
     WorkoutLogger.instance.addEvent({
-      "event_type": AppEvent.workoutStarted.value.toString(),
+      "event_type": AppEvent.workoutStarted.value,
       "workout_type": widget.exerciseType.toString(),
       "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
     });
@@ -100,7 +100,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void handlePageChange(int newPageIndex) {
     WorkoutLogger.instance.addEvent({
-      "event_type": AppEvent.pageSwitched.value.toString(),
+      "event_type": AppEvent.pageSwitched.value,
       "current_page": pageNames[newPageIndex],
       "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
     });

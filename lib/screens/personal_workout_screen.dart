@@ -110,7 +110,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     writeFitFile();
     WorkoutLogger.instance.endWorkout();
     WorkoutLogger.instance.addEvent({
-      "event_type": AppEvent.workoutEnded.value.toString(),
+      "event_type": AppEvent.workoutEnded.value,
       "workout_type": widget.exerciseType.toString(),
       "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
     });

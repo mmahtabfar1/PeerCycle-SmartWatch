@@ -26,7 +26,7 @@ class RoundedButton extends StatelessWidget {
       onPressed: () {
         //log that this button was pressed
         WorkoutLogger.instance.addEvent({
-          "event_type": AppEvent.buttonPressed.value.toString(),
+          "event_type": AppEvent.buttonPressed.value,
           "button_name": name.replaceAll(" ", ""),
           "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
         });

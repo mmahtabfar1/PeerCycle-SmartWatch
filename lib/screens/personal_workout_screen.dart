@@ -10,8 +10,8 @@ import 'package:workout/workout.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 import 'package:peer_cycle/utils.dart';
-
-import '../logging/app_event.dart';
+import 'package:peer_cycle/workout/workout_wrapper.dart';
+import 'package:peer_cycle/logging/app_event.dart';
 
 class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
@@ -20,7 +20,7 @@ class PersonalWorkoutScreen extends StatefulWidget {
     required this.exerciseType
   });
 
-  final Workout workout;
+  final WorkoutWrapper workout;
   final ExerciseType exerciseType;
   static final log = Logger("personal_workout_screen");
 
@@ -57,7 +57,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     super.initState();
     startTimer();
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
-      print("got a ${reading.feature.name} reading");
       WorkoutLogger.instance.logMetric(reading);
       readings.add(reading);
       switch(reading.feature) {
@@ -95,7 +94,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           BluetoothManager.instance.broadcastString("speed:$speedInKph");
           break;
         default:
-          print("GOT LOCATION DATA ${reading.value}");
+          PersonalWorkoutScreen.log.info("GOT LOCATION DATA ${reading.value}");
           break;
       }
     });

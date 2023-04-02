@@ -12,6 +12,7 @@ import 'package:peer_cycle/logging/workout_logger.dart';
 import 'package:peer_cycle/screens/peer_workout_screen.dart';
 import 'package:peer_cycle/screens/personal_workout_screen.dart';
 import 'package:peer_cycle/logging/app_event.dart';
+import 'package:peer_cycle/workout/workout_wrapper.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({
@@ -22,21 +23,12 @@ class WorkoutScreen extends StatefulWidget {
   final ExerciseType exerciseType;
   static final log = Logger("workout_screen");
 
-  static const features = [
-    WorkoutFeature.heartRate,
-    WorkoutFeature.calories,
-    WorkoutFeature.steps,
-    WorkoutFeature.distance,
-    WorkoutFeature.speed,
-    WorkoutFeature.location,
-  ];
-
   @override
   State<StatefulWidget> createState() => _WorkoutScreenState();
 }
 
 class _WorkoutScreenState extends State<WorkoutScreen> {
-  final workout = Workout();
+  final workout = WorkoutWrapper();
   final screenState = Screen();
   StreamSubscription<ScreenStateEvent>? screenStateSubscription;
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -93,7 +85,15 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     WorkoutLogger.instance.startWorkout(widget.exerciseType);
     return workout.start(
       exerciseType: widget.exerciseType,
-      features: WorkoutScreen.features,
+      features: [
+        WorkoutFeature.heartRate,
+        WorkoutFeature.calories,
+        WorkoutFeature.steps,
+        WorkoutFeature.distance,
+        WorkoutFeature.speed,
+        WorkoutFeature.location,
+        //TODO: add power here later
+      ],
       enableGps: true,
     );
   }
@@ -123,7 +123,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         future: startWorkout(),
         builder: (context, snapshot) {
           if(snapshot.hasData) {
-            print("Unsupported features: ${snapshot.data!.unsupportedFeatures}");
+            WorkoutScreen.log.warning("Unsupported features: ${snapshot.data!.unsupportedFeatures}");
             return Scaffold(
                 backgroundColor: Colors.black,
                 body: WatchShape(

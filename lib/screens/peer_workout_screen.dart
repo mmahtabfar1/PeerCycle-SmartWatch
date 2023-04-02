@@ -6,6 +6,7 @@ import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/utils.dart';
+import 'package:peer_cycle/workout/workout_wrapper.dart';
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
@@ -13,7 +14,7 @@ class PeerWorkoutScreen extends StatefulWidget {
       required this.workout,
       required this.exerciseType
   });
-  final Workout workout;
+  final WorkoutWrapper workout;
   final ExerciseType exerciseType;
 
   static final log = Logger("peer_workout_screen");
@@ -69,17 +70,17 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
           return;
         case WorkoutFeature.heartRate:
           setState(() {
-            indivHeartRate = int.tryParse(reading.value) ?? -1;
+            indivHeartRate = (double.tryParse(reading.value) ?? -1).toInt();
           });
           break;
         case WorkoutFeature.calories:
           setState(() {
-            indivCalories = int.tryParse(reading.value) ?? -1;
+            indivCalories = (double.tryParse(reading.value) ?? -1).toInt();
           });
           break;
         case WorkoutFeature.distance:
           setState(() {
-            indivDistance = int.tryParse(reading.value) ?? -1;
+            indivDistance = (double.tryParse(reading.value) ?? -1).toInt();
           });
           break;
         case WorkoutFeature.speed:

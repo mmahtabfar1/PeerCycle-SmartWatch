@@ -216,7 +216,8 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                 height: 40,
                 onPressed: () {
                   stopWorkout();
-                  Navigator.pop(context);
+                  //pop until we are back at the start page
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                 },
                 child: const Text("End Workout",
                     style: TextStyle(color: Colors.white)

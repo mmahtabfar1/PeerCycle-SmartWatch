@@ -40,7 +40,6 @@ class ChooseWorkoutScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  //TODO: add workout icons to these buttons
                   const Text(
                     "SELECT WORKOUT",
                     style: TextStyle(
@@ -58,9 +57,23 @@ class ChooseWorkoutScreen extends StatelessWidget {
                       onPressed: () => {
                         startWorkout(context, ExerciseType.walking)
                       },
-                      child: const Text(
-                        "Walking",
-                        style: TextStyle(color: Colors.black),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const <Widget>[
+                            Text(
+                              "Walking",
+                              style: TextStyle(
+                                color: Colors.white,
+                              )
+                            ),
+                            Icon(
+                              Icons.directions_walk,
+                              color: Colors.white,
+                            )
+                          ],
+                        )
                       )
                     )
                   ),
@@ -74,9 +87,23 @@ class ChooseWorkoutScreen extends StatelessWidget {
                       onPressed: () => {
                         startWorkout(context, ExerciseType.running)
                       },
-                      child: const Text(
-                        "Running",
-                        style: TextStyle(color: Colors.black),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const <Widget>[
+                            Text(
+                              "Running",
+                              style: TextStyle(
+                                color: Colors.white,
+                              )
+                            ),
+                            Icon(
+                              Icons.directions_run,
+                              color: Colors.white,
+                            )
+                          ],
+                        )
                       )
                     )
                   ),
@@ -90,9 +117,23 @@ class ChooseWorkoutScreen extends StatelessWidget {
                       onPressed: () => {
                         startWorkout(context, ExerciseType.biking)
                       },
-                      child: const Text(
-                        "Cycling",
-                        style: TextStyle(color: Colors.black),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const <Widget>[
+                            Text(
+                              "Cycling",
+                              style: TextStyle(
+                                color: Colors.white,
+                              )
+                            ),
+                            Icon(
+                              Icons.directions_bike,
+                              color: Colors.white,
+                            )
+                          ],
+                        )
                       )
                     )
                   ),

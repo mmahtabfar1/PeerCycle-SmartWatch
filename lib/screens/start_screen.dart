@@ -40,7 +40,6 @@ class StartScreen extends StatelessWidget {
                             style: TextStyle(color: Colors.white),
                           )
                       ),
-                      const SizedBox(height: 5),
                       RoundedButton(
                         name: "SettingsButton",
                         width: screenSize.width,
@@ -57,7 +56,6 @@ class StartScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.white),
                         )
                       ),
-                      const SizedBox(height: 5),
                       RoundedButton(
                         name: "ConnectSensorsButton",
                         width: screenSize.width,

@@ -7,7 +7,7 @@ import 'package:peer_cycle/secrets/secrets.dart';
 import 'package:path_provider/path_provider.dart';
 
 class UploadManager {
-  static final log = Logger("workout_logger");
+  static final log = Logger("upload_manager");
 
   static final UploadManager _instance = UploadManager._();
   static UploadManager get instance => _instance;
@@ -21,6 +21,23 @@ class UploadManager {
         _syncUnuploadedFiles();
       }
     });
+  }
+
+  Future<List<String>> getPastWorkouts() async {
+    String appDocumentsDirectory =
+        (await getApplicationDocumentsDirectory()).path;
+
+    Directory unuploadedDir = Directory("$appDocumentsDirectory/unuploaded");
+    Directory uploadedDir = Directory("$appDocumentsDirectory/uploaded");
+
+    List<String> unuploadedWorkouts = unuploadedDir.existsSync()
+      ? unuploadedDir.listSync().map((entry) => entry.toString()).toList()
+      : <String>[];
+    List<String> uploadedWorkotus = uploadedDir.existsSync()
+      ? uploadedDir.listSync().map((entry) => entry.toString()).toList()
+      : <String>[];
+
+    return [...unuploadedWorkouts, ...uploadedWorkotus];
   }
 
   Future<bool> createWorkoutFile(String filename, String json) async {

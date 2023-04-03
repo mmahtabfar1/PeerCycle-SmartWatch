@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peer_cycle/screens/view_personal_info_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wear/wear.dart';
 import 'package:peer_cycle/utils.dart';
@@ -27,7 +28,7 @@ class UpdatePersonalInfoScreen extends StatelessWidget {
                           child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                const Text("Update Personal Info",
+                                const Text("Update User Profile",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -68,7 +69,7 @@ class UpdatePersonalInfoScreen extends StatelessWidget {
                                     style: const TextStyle(color: Colors.white),
                                     decoration: const InputDecoration(
                                       border: OutlineInputBorder(),
-                                      hintText: "Enter Target HR",
+                                      hintText: "Enter Max HR",
                                       filled: true,
                                       fillColor: Colors.grey,
                                     )
@@ -100,9 +101,15 @@ class UpdatePersonalInfoScreen extends StatelessWidget {
                                       await prefs.setInt("target_heart_rate", heartRate);
                                     }
 
-                                    //go back to the settings page
+                                    //remove this page and go back to the view
+                                    //personal info page but replace it so
+                                    //it will see the updated values
                                     if(context.mounted) {
-                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                          builder: (context) => const ViewPersonalInfoScreen()
+                                        )
+                                      );
                                     }
                                   },
                                   child: const Text("Save Changes"),

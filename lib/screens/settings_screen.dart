@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/screens/view_personal_info_screen.dart';
-import 'package:peer_cycle/screens/update_personal_info_screen.dart';
 import 'package:peer_cycle/screens/connect_sensors_screen.dart';
+import 'package:peer_cycle/screens/view_past_workouts_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -35,37 +35,37 @@ class SettingsScreen extends StatelessWidget {
                     SizedBox(
                       height: 40,
                       child: RoundedButton(
-                        name: "UpdatePersonalInfo",
+                        name: "ProfileButton",
                         onPressed: () => {
                           Navigator.push(context,
                             MaterialPageRoute(
-                              builder: (context) => UpdatePersonalInfoScreen()
+                              builder: (context) => const ViewPersonalInfoScreen()
                             )
                           )
                         },
-                        child: const Text("Update Personal Info")
+                        child: const Text("Manage User Profile")
                       ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 40,
                       child: RoundedButton(
-                        name: "ViewPersonalInfo",
+                        name: "ViewPastWorkoutsButton",
                         onPressed: () => {
                           Navigator.push(context,
-                          MaterialPageRoute(
-                            builder: (context) => const ViewPersonalInfoScreen()
+                            MaterialPageRoute(
+                              builder: (context) => const ViewPastWorkoutsScreen()
+                            )
                           )
-                        )
                         },
-                        child: const Text("View Personal Info")
+                        child: const Text("View Past Workouts")
                       ),
                     ),
                     const SizedBox(height: 10),
                     SizedBox(
                       height: 40,
                       child: RoundedButton(
-                        name: "ConnectSensors",
+                        name: "ConnectSensorsButton",
                         onPressed: () => {
                           Navigator.push(context,
                             MaterialPageRoute(

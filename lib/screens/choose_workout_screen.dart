@@ -127,7 +127,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const Text("Enter Target Heart\n Rate Or Age",
+              const Text("Enter Max Heart\n Rate Or Age",
                   style: TextStyle(
                       fontWeight: FontWeight.bold, color: Colors.white)),
               Expanded(
@@ -140,7 +140,7 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                           controller: _heartRateController,
                           style: const TextStyle(color: Colors.white),
                           decoration: const InputDecoration(
-                            labelText: "Target Heart Rate",
+                            labelText: "Max Heart Rate",
                             labelStyle: TextStyle(color: Colors.blueAccent),
                             enabledBorder: UnderlineInputBorder(
                               borderSide: BorderSide(color: Colors.blueAccent),

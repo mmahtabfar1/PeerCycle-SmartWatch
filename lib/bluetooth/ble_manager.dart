@@ -144,6 +144,9 @@ class BleManager {
         ).listen((data) {
           //create a workout reading from the data
           //sink into stream
+          //for reading from cycling power service
+          //index 2 is power in watts
+          //index 4 is cadence in rpm
           _streamController.sink.add(
               WorkoutReading(
                 WorkoutFeature.power,

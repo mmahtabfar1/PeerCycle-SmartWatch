@@ -12,10 +12,8 @@ class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
       super.key,
       required this.workout,
-      required this.exerciseType
   });
   final WorkoutWrapper workout;
-  final ExerciseType exerciseType;
 
   static final log = Logger("peer_workout_screen");
 
@@ -45,14 +43,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
       });
     });
   }
-  final exerciseType = ExerciseType.walking;
-  final features = [
-    WorkoutFeature.heartRate,
-    WorkoutFeature.calories,
-    WorkoutFeature.steps,
-    WorkoutFeature.distance,
-    WorkoutFeature.speed,
-  ];
 
   final List<WorkoutReading> readings = [];
   late StreamSubscription<WorkoutReading> workoutStreamSubscription;

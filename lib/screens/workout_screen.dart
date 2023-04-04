@@ -13,6 +13,7 @@ import 'package:peer_cycle/screens/peer_workout_screen.dart';
 import 'package:peer_cycle/screens/personal_workout_screen.dart';
 import 'package:peer_cycle/logging/app_event.dart';
 import 'package:peer_cycle/workout/workout_wrapper.dart';
+import 'package:peer_cycle/screens/workout_control_screen.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({
@@ -34,6 +35,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
 
   final List<String> pageNames = [];
+  final PageController controller = PageController(initialPage: 1);
 
   @override
   void initState() {
@@ -114,6 +116,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   @override
   void dispose() async {
     super.dispose();
+    controller.dispose();
     await screenStateSubscription?.cancel();
   }
 
@@ -130,9 +133,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     builder: (context, shape, _) {
                       return Center(
                           child: PageView(
+                            controller: controller,
                             onPageChanged: handlePageChange,
                             scrollDirection: Axis.vertical,
                             children: [
+                              getPageViewPage(
+                                const WorkoutControlScreen(),
+                                "workout_control_screen"
+                              ),
                               getPageViewPage(
                                 PersonalWorkoutScreen(
                                     workout: workout,
@@ -143,7 +151,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                               getPageViewPage(
                                 PeerWorkoutScreen(
                                     workout: workout,
-                                    exerciseType: widget.exerciseType
                                 ),
                                 "peer_workout_screen",
                               ),

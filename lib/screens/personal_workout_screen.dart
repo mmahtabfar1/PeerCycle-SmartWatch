@@ -118,12 +118,12 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     stopWorkout();
     await workoutStreamSubscription.cancel();
     writeFitFile();
-    WorkoutLogger.instance.endWorkout();
     WorkoutLogger.instance.addEvent({
       "event_type": AppEvent.workoutEnded.value,
       "workout_type": widget.exerciseType.toString(),
       "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
     });
+    WorkoutLogger.instance.endWorkout();
   }
 
   void writeFitFile() async {
@@ -165,7 +165,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 5),
                 const Text(
                   "WORKOUT STATS",
                   style: TextStyle(
@@ -173,11 +172,12 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     fontWeight: FontWeight.bold,
                   )
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 10),
                 Padding(
                   padding: const EdgeInsets.only(
                     left: 20,
                     right: 20,
+                    bottom: 10,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -221,6 +221,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     ],
                   ),
                 ),
+                /*
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 47),
                   child: RoundedButton(
@@ -237,6 +238,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     ),
                   ),
                 )
+                 */
               ],
             ),
           ),

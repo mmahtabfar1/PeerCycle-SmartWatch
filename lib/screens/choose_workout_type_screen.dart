@@ -25,7 +25,11 @@ class ChooseWorkoutTypeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   const Text(
-                    "CHOOSE WORKOUT MODE",
+                    "CHOOSE",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const Text(
+                    "WORKOUT MODE",
                     style: TextStyle(color: Colors.white),
                   ),
                   const SizedBox(height: 5),

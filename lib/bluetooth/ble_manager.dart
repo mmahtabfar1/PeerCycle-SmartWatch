@@ -116,6 +116,29 @@ class BleManager {
     connectedDevices[_heartRateDeviceKey] = heartRateSensorConnection;
   }
 
+  int _readPower(List<int> data) {
+    int total = data[3];
+    /*
+    data = [_, 0x??, 0x??, ...]
+    want to read index 2 and 3 as one integer
+    shift integer at index 3 left by 8 bits
+    and add the 8 bits from index 2
+    since the data is being stored in little-endian
+    format
+     */
+    total = total << 8;
+    return total + data[2];
+  }
+
+  //TODO: need to fix this
+  double _readCadence(List<int> data) {
+    int time = data[11] << 8;
+    time += data[10];
+    double timeDouble = time.toDouble();
+    timeDouble *= 1/2048;
+    return (1 / timeDouble) * 60.0;
+  }
+
   void connectPowerSensor(DiscoveredDevice device) {
     if(hasPowerSensor()) {
       log.severe("Already have a HR Sensor connected!");
@@ -129,36 +152,38 @@ class BleManager {
     StreamSubscription<List<int>>? powerCharacteristicStream;
 
     StreamSubscription<ConnectionStateUpdate> powerSensorConnection = flutterReactiveBle.connectToDevice(
-        id: device.id,
-        servicesWithCharacteristicsToDiscover: {
-          _cyclingPowerServiceUUID: [_cyclingPowerCharacteristicUUID]
-        }
+      id: device.id,
+      servicesWithCharacteristicsToDiscover: {
+        _cyclingPowerServiceUUID: [_cyclingPowerCharacteristicUUID]
+      }
     ).listen((ConnectionStateUpdate connectionUpdate) {
       if(connectionUpdate.connectionState == DeviceConnectionState.connected) {
         powerCharacteristicStream = flutterReactiveBle.subscribeToCharacteristic(
-            QualifiedCharacteristic(
-                characteristicId: _heartRateCharacteristicUUID,
-                serviceId: _heartRateServiceUUID,
-                deviceId: device.id
-            )
+          QualifiedCharacteristic(
+            characteristicId: _cyclingPowerCharacteristicUUID,
+            serviceId: _cyclingPowerServiceUUID,
+            deviceId: device.id
+          )
         ).listen((data) {
           //create a workout reading from the data
           //sink into stream
           //for reading from cycling power service
-          //index 2 is power in watts
-          //index 4 is cadence in rpm
+          //index 2-3 is power in watts
+          //TODO:
+          //cadence index depends on the header (first 16 bits / index 0 and 1)
+          //which determines in which location the cadence data will be
           _streamController.sink.add(
-              WorkoutReading(
-                WorkoutFeature.power,
-                data[2].toDouble().toString(),
-                null,
-              )
+            WorkoutReading(
+              WorkoutFeature.power,
+              _readPower(data).toDouble().toString(),
+              null,
+            )
           );
 
           _streamController.sink.add(
             WorkoutReading(
               WorkoutFeature.cadence,
-              data[4].toDouble().toString(),
+              _readCadence(data).toString(),
               null,
             )
           );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:peer_cycle/screens/update_personal_info_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'package:peer_cycle/utils.dart';
 
 class ViewPersonalInfoScreen extends StatelessWidget {
   const ViewPersonalInfoScreen({super.key});
@@ -10,9 +11,9 @@ class ViewPersonalInfoScreen extends StatelessWidget {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     //read values from shared preferences
-    String? name = prefs.getString("name");
-    int? age = prefs.getInt("age");
-    int? heartRate = prefs.getInt("target_heart_rate");
+    String? name = prefs.getString(userNameKey);
+    int? age = prefs.getInt(userAgeKey);
+    int? heartRate = prefs.getInt(maxHRKey);
 
     return PersonalInfo(
       name: name ?? "Unknown",

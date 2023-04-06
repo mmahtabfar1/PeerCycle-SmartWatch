@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/bluetooth/ble_manager.dart';
+import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
 
 class WorkoutWrapper {
   Workout workout = Workout();
@@ -15,11 +16,15 @@ class WorkoutWrapper {
   // start
   // 1. start the flutter_workout,
   // 2. start reading from ble_manager heartRate / power sensors
-  Future<WorkoutStartResult> start({
+  Future<WorkoutStartResultWrapper> start({
     required ExerciseType exerciseType,
     required List<WorkoutFeature> features,
-    required bool enableGps
-  }) {
+    required bool enableGps,
+    required bool useHRPercentage,
+    required bool usePowerPercentage,
+    required int maxHR,
+    required int maxPower,
+  }) async {
 
     //remove heartRate feature from requested features
     //if ble hr sensor is connected
@@ -28,7 +33,7 @@ class WorkoutWrapper {
       features.remove(WorkoutFeature.heartRate);
     }
 
-    var res = workout.start(
+    var res = await workout.start(
       exerciseType: exerciseType,
       features: features,
       enableGps: enableGps
@@ -41,7 +46,13 @@ class WorkoutWrapper {
       _streamController.sink.add(reading);
     });
 
-    return res;
+    return WorkoutStartResultWrapper(
+      workoutStartResult: res,
+      useHRPercentage: useHRPercentage,
+      usePowerPercentage: usePowerPercentage,
+      maxHR: maxHR.toDouble(),
+      maxPower: maxPower.toDouble(),
+    );
   }
 
   Future<void> stop() {

@@ -3,6 +3,7 @@ import 'dart:core';
 import 'partner.dart';
 import 'package:workout/workout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:peer_cycle/utils.dart';
 
 class Workout {
   ExerciseType exerciseType;
@@ -74,7 +75,7 @@ class Workout {
       //add target heartRate if the WorkoutFeature is heart rate
       if(key == WorkoutFeature.heartRate) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        map["target_heart_rate"] = prefs.get("target_heart_rate");
+        map["target_heart_rate"] = prefs.get(maxHRKey);
       }
 
       output.add(MapEntry(_getMetricNameForJson(key), map));

@@ -11,6 +11,7 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:peer_cycle/utils.dart';
 
 class BluetoothManager {
   static final BluetoothManager _instance = BluetoothManager._();
@@ -224,7 +225,7 @@ class BluetoothManager {
   Future<void> sendPersonalInfo() async {
     // Get Name
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? name = prefs.getString("name");
+    String? name = prefs.getString(userNameKey);
 
     // Get device info
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();

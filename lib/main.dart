@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
       //can add else clause here to write logs to a file
       //during production
       if (kDebugMode) {
-        print('${record.level.name}: ${record.time}: ${record.message}');
+        print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
       }
     });
   }

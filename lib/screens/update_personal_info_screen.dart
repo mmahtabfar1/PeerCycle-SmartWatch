@@ -90,15 +90,15 @@ class UpdatePersonalInfoScreen extends StatelessWidget {
 
                                     //update the users name
                                     if(name.isNotEmpty) {
-                                      await prefs.setString("name", name);
+                                      await prefs.setString(userNameKey, name);
                                     }
                                     //update the users age
                                     if(age != null) {
-                                      await prefs.setInt("age", age);
+                                      await prefs.setInt(userAgeKey, age);
                                     }
                                     //update the users target heart rate
                                     if(heartRate != null) {
-                                      await prefs.setInt("target_heart_rate", heartRate);
+                                      await prefs.setInt(maxHRKey, heartRate);
                                     }
 
                                     //remove this page and go back to the view

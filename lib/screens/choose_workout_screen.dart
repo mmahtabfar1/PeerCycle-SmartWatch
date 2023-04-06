@@ -13,7 +13,7 @@ class ChooseWorkoutScreen extends StatelessWidget {
   //start the selected workout
   void startWorkout(BuildContext context, ExerciseType exerciseType) async {
     final prefs = await SharedPreferences.getInstance();
-    int? targetHeartRate = prefs.getInt("target_heart_rate");
+    int? targetHeartRate = prefs.getInt(maxHRKey);
     if (targetHeartRate == null && context.mounted) {
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => const TargetHeartRateScreen()));
@@ -227,8 +227,8 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                             if(age == null && heartRate == null) return;
                             int result = heartRate ?? (208 - 0.7*age!.toDouble()).toInt();
                             final sharedPreferences = await SharedPreferences.getInstance();
-                            await sharedPreferences.setInt("age", age!);
-                            await sharedPreferences.setInt("target_heart_rate", result);
+                            await sharedPreferences.setInt(userAgeKey, age!);
+                            await sharedPreferences.setInt(maxHRKey, result);
                             if(context.mounted) Navigator.pop(context);
                           }, child: const Text("Confirm")),
                       ),

@@ -6,8 +6,8 @@ import 'package:logging/logging.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:peer_cycle/logging/fit_activity_logger.dart';
+import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
 import 'package:workout/workout.dart';
-import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/workout/workout_wrapper.dart';
@@ -18,11 +18,13 @@ class PersonalWorkoutScreen extends StatefulWidget {
   const PersonalWorkoutScreen({
     super.key,
     required this.workout,
-    required this.exerciseType
+    required this.exerciseType,
+    required this.workoutStartResultWrapper,
   });
 
   final WorkoutWrapper workout;
   final ExerciseType exerciseType;
+  final WorkoutStartResultWrapper workoutStartResultWrapper;
   static final log = Logger("personal_workout_screen");
 
   @override
@@ -210,35 +212,21 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                     children: <Widget>[
                       MetricTile(
                         icon: const Icon(Icons.favorite_outlined, color: Colors.red),
-                        value: "$heartRate bpm",
+                        value: widget.workoutStartResultWrapper.useHRPercentage
+                            ? "${((heartRate / widget.workoutStartResultWrapper.maxHR) * 100).toStringAsFixed(1)} %"
+                            : "$heartRate bpm",
                         valueColor: Colors.green,
                       ),
                       MetricTile(
                         icon: const Icon(Icons.electric_bolt, color: Colors.yellow),
-                        value: "$power W",
+                        value: widget.workoutStartResultWrapper.usePowerPercentage
+                            ? "${((power / widget.workoutStartResultWrapper.maxPower) * 100).toStringAsFixed(1)} %"
+                            : "$power W",
                         valueColor: Colors.green,
                       ),
                     ],
                   ),
                 ),
-                /*
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 47),
-                  child: RoundedButton(
-                    name: "EndWorkoutButton",
-                    color: const Color.fromRGBO(48, 79, 254, 1),
-                    height: 30,
-                    onPressed: () {
-                      stopWorkout();
-                      //pop until we are back at the start page
-                      Navigator.of(context).popUntil((route) => route.isFirst);
-                    },
-                    child: const Text("End Workout",
-                      style: TextStyle(color: Colors.white)
-                    ),
-                  ),
-                )
-                 */
               ],
             ),
           ),

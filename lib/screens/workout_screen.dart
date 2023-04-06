@@ -14,6 +14,8 @@ import 'package:peer_cycle/screens/personal_workout_screen.dart';
 import 'package:peer_cycle/logging/app_event.dart';
 import 'package:peer_cycle/workout/workout_wrapper.dart';
 import 'package:peer_cycle/screens/workout_control_screen.dart';
+import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
+import 'package:peer_cycle/utils.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({
@@ -73,12 +75,20 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     }
   }
 
-  Future<WorkoutStartResult> startWorkout() async {
+  Future<WorkoutStartResultWrapper> startWorkout() async {
     AndroidDeviceInfo deviceInfo = await deviceInfoPlugin.androidInfo;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     WorkoutLogger.instance.deviceId = deviceInfo.id;
     WorkoutLogger.instance.serialNum = deviceInfo.serialNumber;
-    WorkoutLogger.instance.userName = prefs.getString("name") ?? "Unknown";
+    WorkoutLogger.instance.userName = prefs.getString(userNameKey) ?? "Unknown";
+    //determine if the hr should be displayed as percentage of max HR
+    //default max is 150 bpm if user has not specified
+    int maxHR = prefs.getInt(maxHRKey) ?? 150;
+    //determine if the power should be displayed as percentage of the max Power
+    //default max power is 100 W if user has not specified
+    int maxPower = prefs.getInt(maxPowerKey) ?? 100;
+    bool useHRPercentage = prefs.getBool(useHRPercentageKey) ?? false;
+    bool usePowerPercentage = prefs.getBool(usePowerPercentageKey) ?? false;
     WorkoutLogger.instance.addEvent({
       "event_type": AppEvent.workoutStarted.value,
       "workout_type": widget.exerciseType.toString(),
@@ -94,9 +104,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         WorkoutFeature.distance,
         WorkoutFeature.speed,
         WorkoutFeature.location,
-        //TODO: add power here later
+        WorkoutFeature.power,
       ],
       enableGps: true,
+      useHRPercentage: useHRPercentage,
+      usePowerPercentage: usePowerPercentage,
+      maxHR: maxHR,
+      maxPower: maxPower,
     );
   }
 
@@ -122,11 +136,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<WorkoutStartResult>(
+    return FutureBuilder<WorkoutStartResultWrapper>(
         future: startWorkout(),
         builder: (context, snapshot) {
           if(snapshot.hasData) {
-            WorkoutScreen.log.warning("Unsupported features: ${snapshot.data!.unsupportedFeatures}");
+            WorkoutScreen.log.warning("Unsupported features: ${snapshot.data!.workoutStartResult.unsupportedFeatures}");
             return Scaffold(
                 backgroundColor: Colors.black,
                 body: WatchShape(
@@ -143,8 +157,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                               ),
                               getPageViewPage(
                                 PersonalWorkoutScreen(
-                                    workout: workout,
-                                    exerciseType: widget.exerciseType
+                                  workout: workout,
+                                  exerciseType: widget.exerciseType,
+                                  workoutStartResultWrapper: snapshot.data!,
                                 ),
                                 "personal_workout_screen",
                               ),

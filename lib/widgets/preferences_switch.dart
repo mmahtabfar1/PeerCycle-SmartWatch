@@ -36,6 +36,7 @@ class _PreferencesSwitchState extends State<PreferencesSwitch> {
             Text(
               widget.text,
               style: const TextStyle(
+                fontSize: 11,
                 color: Colors.white,
               )
             ),

@@ -1,31 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:peer_cycle/screens/update_personal_info_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:peer_cycle/screens/edit_personal_info_screen.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
-import 'package:peer_cycle/utils.dart';
+import 'package:peer_cycle/personal_info.dart';
 
 class ViewPersonalInfoScreen extends StatelessWidget {
   const ViewPersonalInfoScreen({super.key});
 
-  Future<PersonalInfo> fetchPersonalInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    //read values from shared preferences
-    String? name = prefs.getString(userNameKey);
-    int? age = prefs.getInt(userAgeKey);
-    int? heartRate = prefs.getInt(maxHRKey);
-
-    return PersonalInfo(
-      name: name ?? "Unknown",
-      age: age ?? -1,
-      targetHeartRate: heartRate ?? -1,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<PersonalInfo>(
-      future: fetchPersonalInfo(),
+      future: PersonalInfo.getInstance(),
       builder: (context, snapshot) {
         if(!snapshot.hasData) {
           return const Scaffold(
@@ -49,38 +33,44 @@ class ViewPersonalInfoScreen extends StatelessWidget {
                   )
                 ),
                 const SizedBox(height: 10),
-                Text("Name: ${snapshot.data?.name}",
+                Text("Name: ${snapshot.data?.name ?? "Unknown"}",
                     style: const TextStyle(
                       color: Colors.white,
                     ),
                 ),
                 const SizedBox(height: 5),
-                Text("Age: ${snapshot.data?.age}",
+                Text("Age: ${snapshot.data?.age ?? "Unknown"}",
                     style: const TextStyle(
                       color: Colors.white,
                     ),
                 ),
                 const SizedBox(height: 5),
-                Text("Max HR: ${snapshot.data?.targetHeartRate}",
+                Text("Max HR: ${snapshot.data?.targetHeartRate ?? "Unknown"} bpm",
                     style: const TextStyle(
                       color: Colors.white,
                     ),
+                ),
+                const SizedBox(height: 5),
+                Text("Max Power: ${snapshot.data?.targetPower ?? "Unknown"} W",
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 5),
                 SizedBox(
                   height: 40,
-                  width: 150,
+                  width: 120,
                   child: RoundedButton(
-                    name: "UpdateProfileButton",
+                    name: "EditProfileButton",
                     onPressed: () => {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
-                          builder: (context) => UpdatePersonalInfoScreen()
+                          builder: (context) => EditPersonalInfoScreen()
                         )
                       )
                     },
                     child: const Text(
-                      "Update Profile",
+                      "Edit Profile",
                       style: TextStyle(
                         color: Colors.white,
                       )
@@ -94,16 +84,4 @@ class ViewPersonalInfoScreen extends StatelessWidget {
       }
     );
   }
-}
-
-class PersonalInfo {
-  final String name;
-  final int age;
-  final int targetHeartRate;
-
-  const PersonalInfo({
-    required this.name,
-    required this.age,
-    required this.targetHeartRate,
-  });
 }

@@ -49,7 +49,7 @@ class SettingsScreen extends StatelessWidget {
                                   )
                                 )
                               },
-                              child: const Text("Manage User Profile")
+                              child: const Text("User Profile")
                             ),
                           ),
                           const SizedBox(height: 10),

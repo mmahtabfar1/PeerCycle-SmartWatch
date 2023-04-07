@@ -136,54 +136,63 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<WorkoutStartResultWrapper>(
+    return WillPopScope(
+      onWillPop: () async {
+        if(workout.completed) {
+          return true;
+        }
+        controller.jumpToPage(0);
+        return false;
+      },
+      child: FutureBuilder<WorkoutStartResultWrapper>(
         future: startWorkout(),
         builder: (context, snapshot) {
           if(snapshot.hasData) {
             WorkoutScreen.log.warning("Unsupported features: ${snapshot.data!.workoutStartResult.unsupportedFeatures}");
             return Scaffold(
-                backgroundColor: Colors.black,
-                body: WatchShape(
-                    builder: (context, shape, _) {
-                      return Center(
-                          child: PageView(
-                            controller: controller,
-                            onPageChanged: handlePageChange,
-                            scrollDirection: Axis.vertical,
-                            children: [
-                              getPageViewPage(
-                                const WorkoutControlScreen(),
-                                "workout_control_screen"
-                              ),
-                              getPageViewPage(
-                                PersonalWorkoutScreen(
-                                  workout: workout,
-                                  exerciseType: widget.exerciseType,
-                                  workoutStartResultWrapper: snapshot.data!,
-                                ),
-                                "personal_workout_screen",
-                              ),
-                              getPageViewPage(
-                                PeerWorkoutScreen(
-                                    workout: workout,
-                                ),
-                                "peer_workout_screen",
-                              ),
-                              getPageViewPage(
-                                const MapScreen(),
-                                "map_screen",
-                              )
-                            ],
-                          )
-                      );
-                    }
-                )
+              backgroundColor: Colors.black,
+              body: WatchShape(
+                builder: (context, shape, _) {
+                  return Center(
+                    child: PageView(
+                      controller: controller,
+                      onPageChanged: handlePageChange,
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        getPageViewPage(
+                          const WorkoutControlScreen(),
+                          "workout_control_screen"
+                        ),
+                        getPageViewPage(
+                          PersonalWorkoutScreen(
+                            workout: workout,
+                            exerciseType: widget.exerciseType,
+                            workoutStartResultWrapper: snapshot.data!,
+                          ),
+                          "personal_workout_screen",
+                        ),
+                        getPageViewPage(
+                          PeerWorkoutScreen(
+                            workout: workout,
+                          ),
+                          "peer_workout_screen",
+                        ),
+                        getPageViewPage(
+                          const MapScreen(),
+                          "map_screen",
+                        )
+                      ],
+                    )
+                  );
+                }
+              )
             );
           }
           return const Center(
             child: CircularProgressIndicator(),
           );
         }
+      ),
     );
   }
 

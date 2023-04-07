@@ -117,7 +117,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   void dispose() async {
     super.dispose();
     _timer.cancel();
-    stopWorkout();
+    await stopWorkout();
     await workoutStreamSubscription.cancel();
     writeFitFile();
     WorkoutLogger.instance.addEvent({
@@ -136,7 +136,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
     await FitActivityLogger.writeFitFile(fitFilePath, readings, widget.exerciseType);
   }
 
-  void stopWorkout() async {
+  Future<void> stopWorkout() async {
     await widget.workout.stop();
   }
 

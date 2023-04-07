@@ -5,6 +5,10 @@ import 'package:peer_cycle/bluetooth/ble_manager.dart';
 import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
 
 class WorkoutWrapper {
+  //keep state on whether workout is completed or not
+  bool get completed => _completed;
+  bool _completed = false;
+
   Workout workout = Workout();
 
   Stream<WorkoutReading> get stream => _streamController.stream;
@@ -25,6 +29,9 @@ class WorkoutWrapper {
     required int maxHR,
     required int maxPower,
   }) async {
+    if(_completed) {
+      throw Exception("can't start workout because it has already completed");
+    }
 
     //remove heartRate feature from requested features
     //if ble hr sensor is connected
@@ -56,6 +63,8 @@ class WorkoutWrapper {
   }
 
   Future<void> stop() {
+    //mark workout as completed
+    _completed = true;
     watchSubscription?.cancel();
     bleSubscription?.cancel();
     return workout.stop();

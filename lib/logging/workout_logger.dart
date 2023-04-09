@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:convert';
 
 import 'package:logging/logging.dart';
@@ -7,6 +8,7 @@ import 'package:peer_cycle/logging/workout.dart';
 import 'package:workout/workout.dart' hide Workout;
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/logging/upload_manager.dart';
+import 'package:path_provider/path_provider.dart';
 
 class WorkoutLogger {
   Workout? workout;
@@ -14,7 +16,7 @@ class WorkoutLogger {
   String? userName;
   String? deviceId;
   String? serialNum;
-  
+
   static final WorkoutLogger instance = WorkoutLogger._();
 
   WorkoutLogger._();
@@ -23,7 +25,7 @@ class WorkoutLogger {
 
   void logMetric(WorkoutReading reading) {
     //if logging a speed metric convert value from m/s to km/h
-    if(reading.feature == WorkoutFeature.speed) {
+    if (reading.feature == WorkoutFeature.speed) {
       workout?.addMetric(
           WorkoutReading(
             WorkoutFeature.speed,
@@ -42,7 +44,7 @@ class WorkoutLogger {
     // Add the workout partners
     BluetoothManager.instance.cleanupLingeringClosedConnections();
     final deviceData = BluetoothManager.instance.deviceData;
-    for(int id in deviceData.keys) {
+    for (int id in deviceData.keys) {
       Map<String, String> data = deviceData[id]!;
       workout?.addPartner(Partner(
         name: data["name"],
@@ -57,7 +59,10 @@ class WorkoutLogger {
     String json = await toJson();
 
     //upload file to analytics team's Database and save locally
-    await UploadManager.instance.createWorkoutFile(DateTime.now().toIso8601String(), json);
+    await UploadManager.instance.createWorkoutFile(
+      DateTime.now().toIso8601String(),
+      json,
+    );
 
     // Clean up logging
     workout = null;
@@ -78,5 +83,36 @@ class WorkoutLogger {
     };
 
     return jsonEncode(map);
+  }
+
+  Future<void> writeSummaryFile() async {
+    try {
+      String appDocumentsDirectory =
+        (await getApplicationDocumentsDirectory()).path;
+      File file = await File("$appDocumentsDirectory/summaries/${workout?.startTimestamp}.json")
+        .create(recursive: true);
+      String strToWrite = _toJsonSummary();
+      await file.writeAsString(strToWrite);
+    } catch (e) {
+      log.severe(e);
+    }
+  }
+
+  ///
+  /// returns a summary of the workout
+  /// instead of time series for each metric this contains
+  /// average values for each metric throughout the workout
+  ///
+  String _toJsonSummary() {
+    return jsonEncode({
+      "name": userName ?? "Unknown",
+      "device_id": deviceId ?? "Unknown",
+      "exercise_type": workout?.exerciseType.toString(),
+      "startTime": workout?.startTimestamp.millisecondsSinceEpoch,
+      "endTime": DateTime.now().millisecondsSinceEpoch,
+      "partners": workout?.partners,
+      //get averages for the workouts metrics
+      "metrics": workout?.summarizeMetrics(),
+    });
   }
 }

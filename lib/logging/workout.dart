@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:convert';
 
 import 'partner.dart';
 import 'package:workout/workout.dart';
@@ -36,6 +37,37 @@ class Workout {
     }
     
     metrics[metric.feature]!.add(metric);
+  }
+
+  ///summary of workout / average of each metric
+  String summarizeMetrics() {
+    Set<WorkoutFeature> featuresToAverage = {
+      WorkoutFeature.cadence,
+      WorkoutFeature.power,
+      WorkoutFeature.heartRate,
+      WorkoutFeature.speed,
+    };
+    Set<WorkoutFeature> featuresToSum = {
+      WorkoutFeature.calories,
+      WorkoutFeature.distance,
+      WorkoutFeature.steps,
+    };
+
+    Map<String, double> map = {};
+    metrics.forEach((feature, readings) {
+      if (featuresToAverage.contains(feature)) {
+        map[feature.name] = readings.map((reading) => reading.value)
+          .map((value) => double.tryParse(value) ?? 0.0)
+          .map((value) => value / readings.length)
+          .reduce((total, current) => total + current);
+      }
+      //the sum is already represented by the last emitted
+      //WorkoutReading in the list
+      else if (featuresToSum.contains(feature)) {
+        map[feature.name] = double.tryParse(readings.last.value) ?? 0.0;
+      }
+    });
+    return jsonEncode(map);
   }
 
   /// Serialize the workout as a JSON string

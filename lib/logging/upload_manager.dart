@@ -33,11 +33,11 @@ class UploadManager {
     List<String> unuploadedWorkouts = unuploadedDir.existsSync()
       ? unuploadedDir.listSync().map((entry) => entry.toString()).toList()
       : <String>[];
-    List<String> uploadedWorkotus = uploadedDir.existsSync()
+    List<String> uploadedWorkouts = uploadedDir.existsSync()
       ? uploadedDir.listSync().map((entry) => entry.toString()).toList()
       : <String>[];
 
-    return [...unuploadedWorkouts, ...uploadedWorkotus];
+    return [...unuploadedWorkouts, ...uploadedWorkouts];
   }
 
   Future<bool> createWorkoutFile(String filename, String json) async {

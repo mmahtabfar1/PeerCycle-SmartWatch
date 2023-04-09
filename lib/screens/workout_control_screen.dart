@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peer_cycle/icons/chequered_flag_icon.dart';
 import 'package:peer_cycle/screens/confirm_end_workout_screen.dart';
 
 class WorkoutControlScreen extends StatelessWidget {
@@ -25,7 +26,7 @@ class WorkoutControlScreen extends StatelessWidget {
               child: IconButton(
                 padding: const EdgeInsets.all(0.0),
                 icon: const Icon(
-                  Icons.cancel_outlined,
+                  ChequeredFlagIcon.chequeredFlag,
                   color: Colors.red,
                   size: 50.0,
                 ),

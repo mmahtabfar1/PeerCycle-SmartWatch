@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:peer_cycle/screens/save_workout_screen.dart';
+import 'package:peer_cycle/logging/workout_logger.dart';
 
-class ConfirmEndWorkoutScreen extends StatelessWidget {
-  const ConfirmEndWorkoutScreen({super.key});
+class SaveWorkoutScreen extends StatelessWidget {
+  const SaveWorkoutScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class ConfirmEndWorkoutScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              "CONFIRM EXIT WORKOUT",
+              "SAVE WORKOUT?",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -34,7 +34,8 @@ class ConfirmEndWorkoutScreen extends StatelessWidget {
                       size: 50.0,
                     ),
                     onPressed: () => {
-                      Navigator.of(context).pop()
+                      //go back to home page
+                      Navigator.of(context).popUntil((route) => route.isFirst)
                     }
                   )
                 ),
@@ -48,13 +49,14 @@ class ConfirmEndWorkoutScreen extends StatelessWidget {
                       color: Colors.green,
                       size: 50.0,
                     ),
-                    onPressed: () => {
-                      //Navigator.of(context).popUntil((route) => route.isFirst)
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => const SaveWorkoutScreen(),
-                        )
-                      )
+                    onPressed: () async {
+                      //save the workout and then go back to home page
+                      await WorkoutLogger.instance.writeSummaryFile();
+                      if (context.mounted) {
+                        Navigator.of(context).popUntil(
+                          (route) => route.isFirst
+                        );
+                      }
                     }
                   )
                 )

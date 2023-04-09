@@ -27,7 +27,7 @@ class WorkoutControlScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(0.0),
                 icon: const Icon(
                   ChequeredFlagIcon.chequeredFlag,
-                  color: Colors.red,
+                  color: Colors.orangeAccent,
                   size: 50.0,
                 ),
                 onPressed: () => {

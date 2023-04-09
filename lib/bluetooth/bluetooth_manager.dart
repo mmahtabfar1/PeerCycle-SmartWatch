@@ -179,7 +179,7 @@ class BluetoothManager {
           disconnectFromDevice(id);
         }
         log.info("Sending string via bluetooth: $str");
-        connection.output.add(ascii.encode(str));
+        connection.output.add(ascii.encode("$str||"));
       } catch (e) {
         log.severe(e);
       }
@@ -192,17 +192,20 @@ class BluetoothManager {
   ///  - All values should be separated by ":" (this will be the delimiter)
   ///  - All other values will be pairs of keys and values
   Future<void> updateDeviceData(int id, Uint8List data) async {
-    List<String> list = ascii.decode(data).split(':');
-    if (list.isEmpty) {
-      log.severe("Received device data that was empty or was not able to be decoded");
-    }
-    if (list.length % 2 != 0) {
-      log.severe("Received device data was of odd length");
-    }
+    // pairs of metrics as they were emitted such as
+    // heartRate:10.0
+    List<String> pairs = ascii.decode(data)
+      .split("||")
+      .where((token) => token.isNotEmpty)
+      .where((token) => token.contains(':'))
+      .toList();
 
-    for (int i = 0; i < list.length; i += 2) {
-      String key = list[i];
-      String value = list[i + 1];
+    log.info("received from bt: $pairs");
+
+    for (int i = 0; i < pairs.length; i++) {
+      List<String> split = pairs[i].split(':');
+      String key = split[0];
+      String value = split[1];
       if (_deviceData[id] == null) {
         _deviceData[id] = {};
       }

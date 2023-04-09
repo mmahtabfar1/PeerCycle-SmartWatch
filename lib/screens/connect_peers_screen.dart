@@ -9,6 +9,7 @@ import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:peer_cycle/screens/connect_device_screen.dart';
+import 'package:peer_cycle/screens/choose_workout_screen.dart';
 
 class ConnectPeersScreen extends StatefulWidget {
   const ConnectPeersScreen({super.key});
@@ -251,15 +252,16 @@ class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
                     height: 30,
                     width: 120,
                     child: RoundedButton(
-                      name: "GoHomeButton",
+                      name: "StartWorkoutButton",
                       height: 30,
                       width: 100,
                       onPressed: () {
-                        final nav = Navigator.of(context);
-                        nav.pop();
-                        nav.pop();
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const ChooseWorkoutScreen()
+                          )
+                        );
                       },
-                      child: const Text("Go Home",
+                      child: const Text("Start Workout",
                           style: TextStyle(color: Colors.white)
                       ),
                     ),

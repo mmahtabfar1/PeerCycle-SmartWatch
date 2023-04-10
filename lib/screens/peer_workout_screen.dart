@@ -7,11 +7,12 @@ import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/workout/workout_wrapper.dart';
+import 'package:peer_cycle/widgets/metric_tile.dart';
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
-      super.key,
-      required this.workout,
+    super.key,
+    required this.workout,
   });
   final WorkoutWrapper workout;
 
@@ -23,20 +24,17 @@ class PeerWorkoutScreen extends StatefulWidget {
 
 class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     with AutomaticKeepAliveClientMixin<PeerWorkoutScreen> {
-
-  int indivHeartRate = 0;
-  int indivCalories = 0;
-  int indivSpeed = 0;
-  int indivDistance = 0;
-
   int heartRate = 0;
-  int calories = 0; //change to time
+  int calories = 0;
   int steps = 0;
+  int distance = 0;
   int speed = 0;
+  int power = 0;
+  int cadence = 0;
   Duration _duration = Duration.zero;
   late Timer _timer;
 
-  void startTimer(){
+  void startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _duration += const Duration(seconds: 1);
@@ -46,40 +44,62 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 
   final List<WorkoutReading> readings = [];
   late StreamSubscription<WorkoutReading> workoutStreamSubscription;
-  late StreamSubscription<Map<int, Map<String, String>>> bluetoothStreamSubscription;
+  late StreamSubscription<Map<int, Map<String, String>>>
+      bluetoothStreamSubscription;
 
   @override
   void initState() {
     super.initState();
     startTimer();
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
-      readings.add(reading);
-      switch(reading.feature) {
-        case WorkoutFeature.steps:
+      switch (reading.feature) {
         case WorkoutFeature.unknown:
           return;
         case WorkoutFeature.heartRate:
           setState(() {
-            indivHeartRate = (double.tryParse(reading.value) ?? -1).toInt();
+            heartRate = (double.tryParse(reading.value) ?? -1).toInt();
           });
+          BluetoothManager.instance
+              .broadcastString("heartRate:${reading.value}");
           break;
         case WorkoutFeature.calories:
           setState(() {
-            indivCalories = (double.tryParse(reading.value) ?? -1).toInt();
+            calories = (double.tryParse(reading.value) ?? -1).toInt();
           });
+          BluetoothManager.instance
+              .broadcastString("calories:${reading.value}");
+          break;
+        case WorkoutFeature.steps: //change to time.
+          setState(() {
+            steps = (double.tryParse(reading.value) ?? -1).toInt();
+          });
+          BluetoothManager.instance.broadcastString("steps:${reading.value}");
           break;
         case WorkoutFeature.distance:
           setState(() {
-            indivDistance = (double.tryParse(reading.value) ?? -1).toInt();
+            distance = (double.tryParse(reading.value) ?? -1).toInt();
           });
+          BluetoothManager.instance
+              .broadcastString("distance:${reading.value}");
           break;
         case WorkoutFeature.speed:
           double speedInKph = mpsToKph(double.tryParse(reading.value) ?? -1.0);
           setState(() {
-            indivSpeed = speedInKph.toInt();
+            speed = speedInKph.toInt();
+          });
+          BluetoothManager.instance.broadcastString("speed:$speedInKph");
+          break;
+        case WorkoutFeature.location:
+          break;
+        case WorkoutFeature.power:
+          setState(() {
+            power = (double.tryParse(reading.value) ?? -1).toInt();
           });
           break;
-        default:
+        case WorkoutFeature.cadence:
+          setState(() {
+            cadence = (double.tryParse(reading.value) ?? -1).toInt();
+          });
           break;
       }
     });
@@ -90,14 +110,14 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     super.dispose();
     _timer.cancel();
     await workoutStreamSubscription.cancel();
-    await bluetoothStreamSubscription.cancel();
   }
 
   _PeerWorkoutScreenState() {
-    bluetoothStreamSubscription = BluetoothManager.instance.deviceDataStream.listen((event) {
+    bluetoothStreamSubscription =
+        BluetoothManager.instance.deviceDataStream.listen((event) {
       final map = event.values.first;
 
-      for(final key in map.keys) {
+      for (final key in map.keys) {
         switch (key) {
           case "heartRate":
             setState(() {
@@ -127,7 +147,8 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   double? getPartnerAttribute(int partnerNum, String attribute) {
     final deviceData = BluetoothManager.instance.deviceData;
     try {
-      return double.tryParse(deviceData.values.elementAt(partnerNum)[attribute]!);
+      return double.tryParse(
+          deviceData.values.elementAt(partnerNum)[attribute]!);
     } catch (e) {
       PeerWorkoutScreen.log.severe(e.toString());
       PeerWorkoutScreen.log.severe("ERROR in getPartnerAttribute!!!");
@@ -139,90 +160,120 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     return Scaffold(
         backgroundColor: Colors.black,
-        body: WatchShape(
-            builder: (context, shape, widget) {
-              return Transform.scale(
-                scale: 0.8,
-                child: Column( //Top Set
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(28, 0, 28, 5),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              const Icon(Icons.favorite_border, color: Colors.red, size: 25,),
-                              const SizedBox(height: 1),
-                              Text(indivHeartRate.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const Icon(Icons.speed, color: Colors.blue, size: 25),
-                              const SizedBox(height: 1),
-                              Text(indivSpeed.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              const Icon(Icons.whatshot, color: Colors.deepOrange, size: 25),
-                              const SizedBox(height: 1),
-                              Text(indivCalories.toString(), style: const TextStyle(color: Colors.white, fontSize: 20))
-                            ],
-                          )
-                        ],
-                      ),
+        body: Stack(
+          children: <Widget>[
+            Container(
+                margin: const EdgeInsets.all(0.0),
+                decoration: const BoxDecoration(
+                  color: Color(0xFF47cb3b),
+                  shape: BoxShape.circle,
+                )),
+            Container(
+                margin: const EdgeInsets.all(7.0),
+                decoration: const BoxDecoration(
+                  color: Colors.black,
+                  shape: BoxShape.circle,
+                )),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                      bottom: 10,
                     ),
-                    Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          PartnerCard(
-                            heartRate: getPartnerAttribute(0, "heartRate")?.toInt(),
-                            speed: getPartnerAttribute(0, "speed")?.toInt(),
-                            calories: getPartnerAttribute(0, "calories")?.toInt()
-                          ),
-                          const SizedBox(height: 6),
-                          PartnerCard(
-                            heartRate: getPartnerAttribute(1, "heartRate")?.toInt(),
-                            speed: getPartnerAttribute(1, "speed")?.toInt(),
-                            calories: getPartnerAttribute(1, "calories")?.toInt()
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                            const Icon(
-                            Icons.place,
-                            color: Colors.grey,
-                          ),
-                            Text(
-                            "$indivDistance m",
-                            style: const TextStyle(color: Colors.white, fontSize: 25),
-                            ),
-                          ]),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                
-                                Text(
-                                  _duration.toString().split('.').first.padLeft(8, "0"),
-                                  style: const TextStyle(color: Colors.white, fontSize: 25),
-                                ),
-                              ]),
-                        ],
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        MetricTile(
+                          icon:
+                              const Icon(Icons.speed, color: Colors.lightBlue),
+                          value: "$speed km/h",
+                          valueColor: Colors.green,
+                        ),
+                        MetricTile(
+                          icon: const Icon(Icons.pin_drop_outlined,
+                              color: Colors.red),
+                          value: "$distance m",
+                          valueColor: Colors.green,
+                        ),
+                        MetricTile(
+                          icon: const Icon(Icons.timer, color: Colors.teal),
+                          value: _duration
+                              .toString()
+                              .split('.')
+                              .first
+                              .padLeft(8, "0"),
+                          valueColor: Colors.green,
+                        )
+                      ],
                     ),
-                  ],
-                ),
-              );
-            }
-        )
-    );
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 20,
+                      right: 20,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        MetricTile(
+                          icon: const Icon(Icons.favorite_outlined,
+                              color: Colors.red),
+                          value: "$heartRate bpm",
+                          valueColor: Colors.green,
+                        ),
+                        MetricTile(
+                          icon: const Icon(Icons.electric_bolt,
+                              color: Colors.yellow),
+                          value: "$power W",
+                          valueColor: Colors.green,
+                        ),
+                      ],
+                    ),
+                  ),
+                  ...getPartnerCards()
+                ],
+              ),
+            ),
+          ],
+        ));
+  }
+
+  List<Widget> getPartnerCards() {
+    List<Widget> partnerCards = [];
+    final deviceData = BluetoothManager.instance.deviceData;
+    if (deviceData[0] != null) {
+      double? heartRate =
+          double.tryParse(deviceData.values.elementAt(0)["heartRate"] ?? "");
+      double? power =
+          double.tryParse(deviceData.values.elementAt(0)["power"] ?? "");
+      partnerCards.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child:
+            PartnerCard(heartRate: heartRate?.toInt(), power: power?.toInt()),
+      ));
+    }
+    if (deviceData[1] != null) {
+      double? heartRate =
+          double.tryParse(deviceData.values.elementAt(1)["heartRate"] ?? "");
+      double? power =
+          double.tryParse(deviceData.values.elementAt(1)["power"] ?? "");
+      partnerCards.add(Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: PartnerCard(
+          heartRate: heartRate?.toInt(),
+          power: power?.toInt(),
+        ),
+      ));
+    }
+    return partnerCards;
   }
 
   @override
@@ -231,63 +282,30 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
 
 class PartnerCard extends StatelessWidget {
   final int? heartRate;
-  final int? calories;
-  final int? speed;
+  final int? power;
 
-   const PartnerCard({
-    super.key,
-    this.heartRate,
-    this.calories,
-    this.speed
-  });
+  const PartnerCard({super.key, this.heartRate, this.power});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5)), color: Color(0xFF5B5B5B)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(
-            height: 40,
-            width: 35,
-            child: Icon(Icons.person)
-            ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.red,
-                width: 3
-              )
-            ),
-            height: 40,
-            width: 50,
-            child: Center(child: Text(heartRate != null ? heartRate.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white))),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.blue,
-                width: 3
-              )
-            ),
-            height: 40,
-            width: 50,
-            child: Center(child: Text(speed != null ? speed.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white ))),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.orange,
-                width: 3
-              )
-            ),
-            height: 40,
-            width: 50,
-            child: Center(child: Text(calories != null ? calories.toString() : "--", style: const TextStyle(fontSize: 20, color: Colors.white))),
-          )
-        ],
+    return Row(children: [
+      Transform.scale(
+        scale: 0.6,
+        child: Container(
+            decoration:
+                BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+            child: const Icon(
+              Icons.person,
+              color: Colors.black,
+            )),
       ),
-    );
+      Text(heartRate != null ? "$heartRate bpm" : "-- bpm",
+          style: TextStyle(color: Colors.green)),
+      SizedBox(width: 25),
+      Text(
+        power != null ? "$power w" : "-- bpm",
+        style: TextStyle(color: Colors.green),
+      )
+    ]);
   }
 }

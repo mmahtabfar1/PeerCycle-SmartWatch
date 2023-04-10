@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:peer_cycle/bluetooth/bluetooth_manager.dart';
-import 'package:wear/wear.dart';
 import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/utils.dart';
@@ -59,35 +58,27 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
           setState(() {
             heartRate = (double.tryParse(reading.value) ?? -1).toInt();
           });
-          BluetoothManager.instance
-              .broadcastString("heartRate:${reading.value}");
           break;
         case WorkoutFeature.calories:
           setState(() {
             calories = (double.tryParse(reading.value) ?? -1).toInt();
           });
-          BluetoothManager.instance
-              .broadcastString("calories:${reading.value}");
           break;
         case WorkoutFeature.steps: //change to time.
           setState(() {
             steps = (double.tryParse(reading.value) ?? -1).toInt();
           });
-          BluetoothManager.instance.broadcastString("steps:${reading.value}");
           break;
         case WorkoutFeature.distance:
           setState(() {
             distance = (double.tryParse(reading.value) ?? -1).toInt();
           });
-          BluetoothManager.instance
-              .broadcastString("distance:${reading.value}");
           break;
         case WorkoutFeature.speed:
           double speedInKph = mpsToKph(double.tryParse(reading.value) ?? -1.0);
           setState(() {
             speed = speedInKph.toInt();
           });
-          BluetoothManager.instance.broadcastString("speed:$speedInKph");
           break;
         case WorkoutFeature.location:
           break;
@@ -110,38 +101,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     super.dispose();
     _timer.cancel();
     await workoutStreamSubscription.cancel();
-  }
-
-  _PeerWorkoutScreenState() {
-    bluetoothStreamSubscription =
-        BluetoothManager.instance.deviceDataStream.listen((event) {
-      final map = event.values.first;
-
-      for (final key in map.keys) {
-        switch (key) {
-          case "heartRate":
-            setState(() {
-              heartRate = double.parse(map[key] ?? "-1").toInt();
-            });
-            break;
-          case "calories":
-            setState(() {
-              calories = double.parse(map[key] ?? "-1").toInt();
-            });
-            break;
-          case "steps":
-            setState(() {
-              steps = double.parse(map[key] ?? "-1").toInt();
-            });
-            break;
-          case "speed":
-            setState(() {
-              speed = double.parse(map[key] ?? "-1").toInt();
-            });
-            break;
-        }
-      }
-    });
   }
 
   double? getPartnerAttribute(int partnerNum, String attribute) {
@@ -249,29 +208,45 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   List<Widget> getPartnerCards() {
     List<Widget> partnerCards = [];
     final deviceData = BluetoothManager.instance.deviceData;
-    if (deviceData[0] != null) {
-      double? heartRate =
-          double.tryParse(deviceData.values.elementAt(0)["heartRate"] ?? "");
-      double? power =
-          double.tryParse(deviceData.values.elementAt(0)["power"] ?? "");
-      partnerCards.add(Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child:
-            PartnerCard(heartRate: heartRate?.toInt(), power: power?.toInt()),
-      ));
+    if (deviceData.isNotEmpty) {
+      try {
+        double? heartRate =
+        double.tryParse(deviceData.values.elementAt(0)["heartRate"] ?? "");
+        double? power =
+        double.tryParse(deviceData.values.elementAt(0)["power"] ?? "");
+        partnerCards.add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child:
+          PartnerCard(heartRate: heartRate?.toInt(), power: power?.toInt()),
+        ));
+      } catch (e) {
+        partnerCards.add(const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: PartnerCard(heartRate: null, power: null),
+        ));
+        PeerWorkoutScreen.log.severe(e);
+      }
     }
-    if (deviceData[1] != null) {
-      double? heartRate =
-          double.tryParse(deviceData.values.elementAt(1)["heartRate"] ?? "");
-      double? power =
-          double.tryParse(deviceData.values.elementAt(1)["power"] ?? "");
-      partnerCards.add(Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
-        child: PartnerCard(
-          heartRate: heartRate?.toInt(),
-          power: power?.toInt(),
-        ),
-      ));
+    if (deviceData.values.length >= 2) {
+      try {
+        double? heartRate =
+        double.tryParse(deviceData.values.elementAt(1)["heartRate"] ?? "");
+        double? power =
+        double.tryParse(deviceData.values.elementAt(1)["power"] ?? "");
+        partnerCards.add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30),
+          child: PartnerCard(
+            heartRate: heartRate?.toInt(),
+            power: power?.toInt(),
+          ),
+        ));
+      } catch (e) {
+        partnerCards.add(const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 30),
+          child: PartnerCard(heartRate: null, power: null),
+        ));
+        PeerWorkoutScreen.log.severe(e);
+      }
     }
     return partnerCards;
   }
@@ -293,18 +268,18 @@ class PartnerCard extends StatelessWidget {
         scale: 0.6,
         child: Container(
             decoration:
-                BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
+                const BoxDecoration(shape: BoxShape.circle, color: Colors.grey),
             child: const Icon(
               Icons.person,
               color: Colors.black,
             )),
       ),
       Text(heartRate != null ? "$heartRate bpm" : "-- bpm",
-          style: TextStyle(color: Colors.green)),
-      SizedBox(width: 25),
+          style: const TextStyle(color: Colors.green)),
+      const SizedBox(width: 25),
       Text(
-        power != null ? "$power w" : "-- bpm",
-        style: TextStyle(color: Colors.green),
+        power != null ? "$power W" : "-- W",
+        style: const TextStyle(color: Colors.green),
       )
     ]);
   }

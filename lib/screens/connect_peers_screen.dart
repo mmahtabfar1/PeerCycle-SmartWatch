@@ -50,7 +50,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                     child: Row(
                       children: const <Widget>[
                         Icon(Icons.bluetooth_searching),
-                        Text("Bluetooth Server", style: TextStyle(color: Colors.white)),
+                        Text("Host Workout", style: TextStyle(color: Colors.white)),
                       ],
                     )
                 ),
@@ -71,7 +71,7 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
                     child: Row(
                       children: const <Widget>[
                         Icon(Icons.search),
-                        Text("Search For Peers", style: TextStyle(color: Colors.white)),
+                        Text("Join Workout", style: TextStyle(color: Colors.white)),
                       ],
                     )
                 ),

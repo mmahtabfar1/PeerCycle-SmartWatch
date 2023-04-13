@@ -103,6 +103,7 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
           setState(() {
             power = (double.tryParse(reading.value) ?? -1).toInt();
           });
+          BluetoothManager.instance.broadcastString("power:${reading.value}");
           break;
         case WorkoutFeature.cadence:
           setState(() {

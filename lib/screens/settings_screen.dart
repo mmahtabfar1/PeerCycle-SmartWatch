@@ -8,6 +8,8 @@ import 'package:peer_cycle/screens/view_personal_info_screen.dart';
 import 'package:peer_cycle/screens/connect_sensors_screen.dart';
 import 'package:peer_cycle/screens/view_past_workouts_screen.dart';
 
+import '../bluetooth/bluetooth_manager.dart';
+
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
@@ -72,12 +74,14 @@ class SettingsScreen extends StatelessWidget {
                             height: 40,
                             child: RoundedButton(
                               name: "ConnectSensorsButton",
-                              onPressed: () => {
+                              onPressed: () async {
+                                bool success = await BluetoothManager.instance.requestBluetoothPermissions();
+                                if(!success) return;
                                 Navigator.push(context,
                                   MaterialPageRoute(
                                     builder: (context) => const ConnectSensorsScreen()
                                   )
-                                )
+                                );
                               },
                               child: const Text("Connect Sensors")
                             ),

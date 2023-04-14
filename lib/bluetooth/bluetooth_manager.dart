@@ -214,14 +214,18 @@ class BluetoothManager {
     _deviceDataStreamController.sink.add(_deviceData);
   }
 
-  Future<void> requestBluetoothPermissions() async {
-    // Implement error/denied permission handling
-    await [
+  Future<bool> requestBluetoothPermissions() async {
+    var res = await [
       Permission.bluetooth,
       Permission.bluetoothAdvertise,
       Permission.bluetoothConnect,
-      Permission.bluetoothScan
+      Permission.bluetoothScan,
+      Permission.location
     ].request();
+    
+    return !res.containsValue(PermissionStatus.denied) && 
+    !res.containsValue(PermissionStatus.permanentlyDenied) && 
+    !res.containsValue(PermissionStatus.restricted);
   }
 
   /// Sends personal info to connected devices needed for identification

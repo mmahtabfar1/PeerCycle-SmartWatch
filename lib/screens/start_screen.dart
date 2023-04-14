@@ -6,6 +6,8 @@ import 'package:peer_cycle/widgets/rounded_button.dart';
 import 'package:peer_cycle/screens/settings_screen.dart';
 import 'package:peer_cycle/screens/choose_workout_type_screen.dart';
 
+import '../bluetooth/bluetooth_manager.dart';
+
 class StartScreen extends StatelessWidget {
   const StartScreen({super.key});
 
@@ -61,14 +63,16 @@ class StartScreen extends StatelessWidget {
                         width: screenSize.width,
                         height: 40,
                         color: const Color.fromRGBO(48, 79, 254, 1),
-                        onPressed: () => {
+                        onPressed: () async {
+                          bool success = await BluetoothManager.instance.requestBluetoothPermissions();
+                          if(!success) return;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
                                 const ConnectSensorsScreen()
                             ),
-                          )
+                          );
                         },
                         child: const Text(
                           "SENSORS",

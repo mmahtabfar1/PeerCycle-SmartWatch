@@ -59,7 +59,7 @@ class ChooseWorkoutTypeScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const ChooseWorkoutScreen()
+                            builder: (context) => const ChooseWorkoutScreen(partnerWorkout: false)
                         )
                       )
                     },

@@ -257,7 +257,7 @@ class _BluetoothServerScreenState extends State<BluetoothServerScreen> {
                       width: 100,
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const ChooseWorkoutScreen()
+                          builder: (context) => const ChooseWorkoutScreen(partnerWorkout: true)
                           )
                         );
                       },

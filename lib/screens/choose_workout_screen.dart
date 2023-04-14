@@ -8,142 +8,133 @@ import 'package:workout/workout.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChooseWorkoutScreen extends StatelessWidget {
-  const ChooseWorkoutScreen({super.key});
+  const ChooseWorkoutScreen({super.key, required this.partnerWorkout});
+
+  final bool partnerWorkout;
 
   //start the selected workout
   void startWorkout(BuildContext context, ExerciseType exerciseType) async {
     final prefs = await SharedPreferences.getInstance();
     int? targetHeartRate = prefs.getInt(maxHRKey);
     if (targetHeartRate == null && context.mounted) {
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const TargetHeartRateScreen()));
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const TargetHeartRateScreen()));
     } else {
       Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => WorkoutScreen(exerciseType: exerciseType)));
+              builder: (context) => WorkoutScreen(
+                  exerciseType: exerciseType,
+                  displayPartnerScreen: partnerWorkout)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: WatchShape(
-        builder: (context, shape, widget) {
+        backgroundColor: Colors.black,
+        body: WatchShape(builder: (context, shape, widget) {
           Size screenSize = getWatchScreenSize(context);
           return Center(
-            child: Container(
-              color: Colors.black,
-              height: screenSize.height + 10,
-              width: screenSize.width + 10,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  const Text(
-                    "SELECT WORKOUT",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white
-                    ),
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 30,
-                    width: screenSize.width - 20,
-                    child: RoundedButton(
-                      name: "StartWalkButton",
-                      color: const Color.fromRGBO(48, 79, 254, 1),
-                      onPressed: () => {
-                        startWorkout(context, ExerciseType.walking)
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const <Widget>[
-                            Text(
-                              "Walking",
-                              style: TextStyle(
-                                color: Colors.white,
-                              )
-                            ),
-                            Icon(
-                              Icons.directions_walk,
-                              color: Colors.white,
-                            )
-                          ],
-                        )
-                      )
-                    )
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 30,
-                    width: screenSize.width - 20,
-                    child: RoundedButton(
-                      name: "StartRunButton",
-                      color: const Color.fromRGBO(48, 79, 254, 1),
-                      onPressed: () => {
-                        startWorkout(context, ExerciseType.running)
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const <Widget>[
-                            Text(
-                              "Running",
-                              style: TextStyle(
-                                color: Colors.white,
-                              )
-                            ),
-                            Icon(
-                              Icons.directions_run,
-                              color: Colors.white,
-                            )
-                          ],
-                        )
-                      )
-                    )
-                  ),
-                  const SizedBox(height: 5),
-                  SizedBox(
-                    height: 30,
-                    width: screenSize.width - 20,
-                    child: RoundedButton(
-                      name: "StartCycleButton",
-                      color: const Color.fromRGBO(48, 79, 254, 1),
-                      onPressed: () => {
-                        startWorkout(context, ExerciseType.biking)
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const <Widget>[
-                            Text(
-                              "Cycling",
-                              style: TextStyle(
-                                color: Colors.white,
-                              )
-                            ),
-                            Icon(
-                              Icons.directions_bike,
-                              color: Colors.white,
-                            )
-                          ],
-                        )
-                      )
-                    )
-                  ),
-                ]
-              )
-            )
-          );
-        }
-      )
-    );
+              child: Container(
+                  color: Colors.black,
+                  height: screenSize.height + 10,
+                  width: screenSize.width + 10,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const Text(
+                          "SELECT WORKOUT",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        const SizedBox(height: 5),
+                        SizedBox(
+                            height: 30,
+                            width: screenSize.width - 20,
+                            child: RoundedButton(
+                                name: "StartWalkButton",
+                                color: const Color.fromRGBO(48, 79, 254, 1),
+                                onPressed: () => {
+                                      startWorkout(
+                                          context, ExerciseType.walking)
+                                    },
+                                child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: const <Widget>[
+                                        Text("Walking",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            )),
+                                        Icon(
+                                          Icons.directions_walk,
+                                          color: Colors.white,
+                                        )
+                                      ],
+                                    )))),
+                        const SizedBox(height: 5),
+                        SizedBox(
+                            height: 30,
+                            width: screenSize.width - 20,
+                            child: RoundedButton(
+                                name: "StartRunButton",
+                                color: const Color.fromRGBO(48, 79, 254, 1),
+                                onPressed: () => {
+                                      startWorkout(
+                                          context, ExerciseType.running)
+                                    },
+                                child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: const <Widget>[
+                                        Text("Running",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            )),
+                                        Icon(
+                                          Icons.directions_run,
+                                          color: Colors.white,
+                                        )
+                                      ],
+                                    )))),
+                        const SizedBox(height: 5),
+                        SizedBox(
+                            height: 30,
+                            width: screenSize.width - 20,
+                            child: RoundedButton(
+                                name: "StartCycleButton",
+                                color: const Color.fromRGBO(48, 79, 254, 1),
+                                onPressed: () => {
+                                      startWorkout(context, ExerciseType.biking)
+                                    },
+                                child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 5),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: const <Widget>[
+                                        Text("Cycling",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            )),
+                                        Icon(
+                                          Icons.directions_bike,
+                                          color: Colors.white,
+                                        )
+                                      ],
+                                    )))),
+                      ])));
+        }));
   }
 }
 
@@ -220,17 +211,21 @@ class _TargetHeartRateScreenState extends State<TargetHeartRateScreen> {
                       Container(
                         margin: const EdgeInsets.symmetric(horizontal: 10),
                         child: ElevatedButton(
-                          onPressed: () async {
-                            // Do input validation and then write the shared prefs
-                            int? heartRate = int.tryParse(_heartRateController.text);
-                            int? age = int.tryParse(_ageController.text);
-                            if(age == null && heartRate == null) return;
-                            int result = heartRate ?? (208 - 0.7*age!.toDouble()).toInt();
-                            final sharedPreferences = await SharedPreferences.getInstance();
-                            await sharedPreferences.setInt(userAgeKey, age!);
-                            await sharedPreferences.setInt(maxHRKey, result);
-                            if(context.mounted) Navigator.pop(context);
-                          }, child: const Text("Confirm")),
+                            onPressed: () async {
+                              // Do input validation and then write the shared prefs
+                              int? heartRate =
+                                  int.tryParse(_heartRateController.text);
+                              int? age = int.tryParse(_ageController.text);
+                              if (age == null && heartRate == null) return;
+                              int result = heartRate ??
+                                  (208 - 0.7 * age!.toDouble()).toInt();
+                              final sharedPreferences =
+                                  await SharedPreferences.getInstance();
+                              await sharedPreferences.setInt(userAgeKey, age!);
+                              await sharedPreferences.setInt(maxHRKey, result);
+                              if (context.mounted) Navigator.pop(context);
+                            },
+                            child: const Text("Confirm")),
                       ),
                     ],
                   ),

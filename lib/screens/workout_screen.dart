@@ -18,12 +18,13 @@ import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
 import 'package:peer_cycle/utils.dart';
 
 class WorkoutScreen extends StatefulWidget {
-  const WorkoutScreen({
-    super.key,
-    required this.exerciseType,
-  });
+  const WorkoutScreen(
+      {super.key,
+      required this.exerciseType,
+      required this.displayPartnerScreen});
 
   final ExerciseType exerciseType;
+  final bool displayPartnerScreen;
   static final log = Logger("workout_screen");
 
   @override
@@ -46,7 +47,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     try {
       screenStateSubscription = screenState.screenStateStream?.listen((event) {
         final timestamp = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-        switch(event) {
+        switch (event) {
           case ScreenStateEvent.SCREEN_ON:
             WorkoutLogger.instance.addEvent({
               "event_type": AppEvent.screenOn.value,
@@ -134,66 +135,68 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     await screenStateSubscription?.cancel();
   }
 
+  List<Widget> generatePageViews(
+      AsyncSnapshot<WorkoutStartResultWrapper> snapshot) {
+    List<Widget> pageViews = [];
+    pageViews.add(getPageViewPage(
+        const WorkoutControlScreen(), "workout_control_screen"));
+
+    pageViews.add(getPageViewPage(
+      PersonalWorkoutScreen(
+        workout: workout,
+        exerciseType: widget.exerciseType,
+        workoutStartResultWrapper: snapshot.data!,
+      ),
+      "personal_workout_screen",
+    ));
+
+    if (widget.displayPartnerScreen) {
+      pageViews.add(getPageViewPage(
+        PeerWorkoutScreen(
+          workout: workout,
+        ),
+        "peer_workout_screen",
+      ));
+    }
+
+    pageViews.add(getPageViewPage(
+      const MapScreen(),
+      "map_screen",
+    ));
+    return pageViews;
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        if(workout.completed) {
+        if (workout.completed) {
           return true;
         }
         controller.jumpToPage(0);
         return false;
       },
       child: FutureBuilder<WorkoutStartResultWrapper>(
-        future: startWorkout(),
-        builder: (context, snapshot) {
-          if(snapshot.hasData) {
-            WorkoutScreen.log.warning("Unsupported features: ${snapshot.data!.workoutStartResult.unsupportedFeatures}");
-            return Scaffold(
-              backgroundColor: Colors.black,
-              body: WatchShape(
-                builder: (context, shape, _) {
-                  return Center(
-                    child: PageView(
-                      controller: controller,
-                      onPageChanged: handlePageChange,
-                      scrollDirection: Axis.vertical,
-                      children: [
-                        getPageViewPage(
-                          const WorkoutControlScreen(),
-                          "workout_control_screen"
-                        ),
-                        getPageViewPage(
-                          PersonalWorkoutScreen(
-                            workout: workout,
-                            exerciseType: widget.exerciseType,
-                            workoutStartResultWrapper: snapshot.data!,
-                          ),
-                          "personal_workout_screen",
-                        ),
-                        getPageViewPage(
-                          PeerWorkoutScreen(
-                            workout: workout,
-                          ),
-                          "peer_workout_screen",
-                        ),
-                        getPageViewPage(
-                          const MapScreen(),
-                          "map_screen",
-                        )
-                      ],
-                    )
-                  );
-                }
-              )
+          future: startWorkout(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              WorkoutScreen.log.warning(
+                  "Unsupported features: ${snapshot.data!.workoutStartResult.unsupportedFeatures}");
+              return Scaffold(
+                  backgroundColor: Colors.black,
+                  body: WatchShape(builder: (context, shape, _) {
+                    return Center(
+                        child: PageView(
+                            controller: controller,
+                            onPageChanged: handlePageChange,
+                            scrollDirection: Axis.vertical,
+                            children: generatePageViews(snapshot)));
+                  }));
+            }
+            return const Center(
+              child: CircularProgressIndicator(),
             );
-          }
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-      ),
+          }),
     );
   }
-
 }

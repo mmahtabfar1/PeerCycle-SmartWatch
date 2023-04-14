@@ -51,7 +51,7 @@ class ViewPersonalInfoScreen extends StatelessWidget {
                     ),
                 ),
                 const SizedBox(height: 5),
-                Text("Max Power: ${snapshot.data?.targetPower ?? "Unknown"} W",
+                Text("FTP: ${snapshot.data?.targetPower ?? "Unknown"} W",
                   style: const TextStyle(
                     color: Colors.white,
                   ),

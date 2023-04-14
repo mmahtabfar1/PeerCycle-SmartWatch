@@ -28,7 +28,7 @@ double mpsToKph(double speed) {
 
 //keys for storing user preferences/info
 const String maxHRKey = "target_heart_rate";
-const String maxPowerKey = "target_power";
+const String ftpKey = "target_power";
 const String useHRPercentageKey = "use_hr_percentage";
 const String usePowerPercentageKey = "use_power_percentage";
 const String userNameKey = "name";

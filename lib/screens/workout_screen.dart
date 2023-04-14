@@ -87,7 +87,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     int maxHR = prefs.getInt(maxHRKey) ?? 150;
     //determine if the power should be displayed as percentage of the max Power
     //default max power is 100 W if user has not specified
-    int maxPower = prefs.getInt(maxPowerKey) ?? 100;
+    int maxPower = prefs.getInt(ftpKey) ?? 100;
     bool useHRPercentage = prefs.getBool(useHRPercentageKey) ?? false;
     bool usePowerPercentage = prefs.getBool(usePowerPercentageKey) ?? false;
     WorkoutLogger.instance.addEvent({

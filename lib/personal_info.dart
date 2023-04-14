@@ -20,7 +20,7 @@ class PersonalInfo {
       name: prefs.getString(userNameKey),
       age: prefs.getInt(userAgeKey),
       targetHeartRate: prefs.getInt(maxHRKey),
-      targetPower: prefs.getInt(maxPowerKey),
+      targetPower: prefs.getInt(ftpKey),
     );
   }
 }

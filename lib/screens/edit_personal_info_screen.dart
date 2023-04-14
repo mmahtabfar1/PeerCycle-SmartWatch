@@ -113,14 +113,14 @@ class EditPersonalInfoScreen extends StatelessWidget {
                             keyboardType: TextInputType.number,
                             style: const TextStyle(color: Colors.white),
                             decoration: const InputDecoration(
-                              labelText: "Max Power:",
+                              labelText: "FTP:",
                               labelStyle: TextStyle(color: Colors.blueAccent),
                               enabledBorder: OutlineInputBorder(
                                 borderSide: BorderSide(
                                   color: Colors.blueAccent,
                                 )
                               ),
-                              hintText: "Enter Max Power (W)",
+                              hintText: "Enter FTP (W)",
                             )
                           ),
                         ),
@@ -152,7 +152,7 @@ class EditPersonalInfoScreen extends StatelessWidget {
                             }
                             //update the users max power
                             if(power != null) {
-                              await prefs.setInt(maxPowerKey, power);
+                              await prefs.setInt(ftpKey, power);
                             }
 
                             //remove this page and go back to the view

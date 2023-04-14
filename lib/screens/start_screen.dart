@@ -75,7 +75,7 @@ class StartScreen extends StatelessWidget {
                           );
                         },
                         child: const Text(
-                          "SENSORS",
+                          "CONNECT SENSORS",
                           style: TextStyle(color: Colors.white),
                         )
                       ),

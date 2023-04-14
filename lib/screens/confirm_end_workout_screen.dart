@@ -13,7 +13,7 @@ class ConfirmEndWorkoutScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             const Text(
-              "CONFIRM EXIT WORKOUT",
+              "EXIT WORKOUT?",
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,

@@ -107,6 +107,9 @@ class _ConnectPeersScreenState extends State<ConnectPeersScreen> {
 class ScanningScreen extends StatefulWidget {
   const ScanningScreen({super.key});
 
+  //logger
+  static final log = Logger("scanning_screen");
+
   @override
   State<ScanningScreen> createState() => _ScanningScreenState();
 }
@@ -121,7 +124,7 @@ class _ScanningScreenState extends State<ScanningScreen> {
     discoveryStream = BluetoothManager.instance.startDeviceDiscovery();
     discoveryStreamSubscription = discoveryStream?.listen((event) {
       setState(() {
-        if (event.device.name == null || event.device.isConnected) return;
+        if (event.device.name == null) return;
         if (devices.containsKey(event.device.name)) return;
         final textWidget = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -129,9 +132,9 @@ class _ScanningScreenState extends State<ScanningScreen> {
               name: "ConnectToBluetoothDeviceButton",
               height: 40,
               width: 40,
+              color: event.device.isConnected ? Colors.lightGreen : const Color.fromRGBO(91, 91, 91, 1),
               onPressed: () {
-                if (BluetoothManager.instance.connecting) return;
-
+                if (BluetoothManager.instance.connecting || event.device.isConnected) return;
                 //replace this screen with the connect device screen
                 Navigator.pushReplacement(
                   context,

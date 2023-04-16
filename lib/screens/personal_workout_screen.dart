@@ -35,11 +35,13 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   with AutomaticKeepAliveClientMixin<PersonalWorkoutScreen> {
 
   int heartRate = 0;
+  bool useHRPercentage = false;
   int calories = 0;
   int steps = 0;
   int distance = 0;
   int speed = 0;
   int power = 0;
+  bool usePowerPercentage = false;
   int cadence = 0;
   Duration _duration = Duration.zero;
   late Timer _timer;
@@ -59,6 +61,8 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   void initState() {
     super.initState();
     startTimer();
+    useHRPercentage = widget.workoutStartResultWrapper.useHRPercentage;
+    usePowerPercentage = widget.workoutStartResultWrapper.usePowerPercentage;
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
       WorkoutLogger.instance.logMetric(reading);
       readings.add(reading);
@@ -144,7 +148,6 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return Scaffold(
       backgroundColor: Colors.black,
       body: Stack(
@@ -211,19 +214,33 @@ class _PersonalWorkoutScreenState extends State<PersonalWorkoutScreen>
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      MetricTile(
-                        icon: const Icon(Icons.favorite_outlined, color: Colors.red),
-                        value: widget.workoutStartResultWrapper.useHRPercentage
-                            ? "${((heartRate / widget.workoutStartResultWrapper.maxHR) * 100).toStringAsFixed(1)} %"
-                            : "$heartRate bpm",
-                        valueColor: Colors.green,
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            useHRPercentage = !useHRPercentage;
+                          });
+                        },
+                        child: MetricTile(
+                          icon: const Icon(Icons.favorite_outlined, color: Colors.red),
+                          value: useHRPercentage
+                              ? "${((heartRate / widget.workoutStartResultWrapper.maxHR) * 100).toStringAsFixed(1)} %"
+                              : "$heartRate bpm",
+                          valueColor: Colors.green,
+                        ),
                       ),
-                      MetricTile(
-                        icon: const Icon(Icons.electric_bolt, color: Colors.yellow),
-                        value: widget.workoutStartResultWrapper.usePowerPercentage
-                            ? "${((power / widget.workoutStartResultWrapper.maxPower) * 100).toStringAsFixed(1)} %"
-                            : "$power W",
-                        valueColor: Colors.green,
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            usePowerPercentage = !usePowerPercentage;
+                          });
+                        },
+                        child: MetricTile(
+                          icon: const Icon(Icons.electric_bolt, color: Colors.yellow),
+                          value: usePowerPercentage
+                              ? "${((power / widget.workoutStartResultWrapper.maxPower) * 100).toStringAsFixed(1)} %"
+                              : "$power W",
+                          valueColor: Colors.green,
+                        ),
                       ),
                     ],
                   ),

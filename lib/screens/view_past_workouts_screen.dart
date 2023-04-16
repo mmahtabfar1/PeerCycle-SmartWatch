@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/widgets/rounded_button.dart';
+import 'package:peer_cycle/screens/workout_summary_screen.dart';
 
 class ViewPastWorkoutsScreen extends StatelessWidget {
   const ViewPastWorkoutsScreen({super.key});
@@ -35,7 +36,7 @@ class ViewPastWorkoutsScreen extends StatelessWidget {
   /// method that reads past workouts from disk
   /// and returns list of widgets representing
   /// each saved workout session
-  Future<List<Widget>> _getPastWorkouts() async {
+  Future<List<Widget>> _getPastWorkouts(BuildContext context) async {
     String appDocumentsDirectory =
         (await getApplicationDocumentsDirectory()).path;
     Directory summariesDir = Directory("$appDocumentsDirectory/summaries");
@@ -57,6 +58,11 @@ class ViewPastWorkoutsScreen extends StatelessWidget {
             name: "PastWorkoutEntryButton",
             onPressed: () async {
               //push the page to view this summary here
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => WorkoutSummaryScreen(summaryFilePath: path)
+                )
+              );
             },
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 5),
@@ -87,7 +93,7 @@ class ViewPastWorkoutsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<List<Widget>>(
-      future: _getPastWorkouts(),
+      future: _getPastWorkouts(context),
       builder: (context, snapshot) {
         if(!snapshot.hasData) {
           return const Center(

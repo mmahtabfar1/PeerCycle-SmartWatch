@@ -12,6 +12,8 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADVERTISE" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Required to track location in background -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
    <application
         android:label="peer_cycle"

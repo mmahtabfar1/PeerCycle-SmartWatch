@@ -154,6 +154,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       pageViews.add(getPageViewPage(
         PeerWorkoutScreen(
           workout: workout,
+          workoutStartResultWrapper: snapshot.data!
         ),
         "peer_workout_screen",
       ));

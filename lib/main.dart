@@ -1,6 +1,8 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:peer_cycle/screens/start_screen.dart';
 import 'package:wear/wear.dart';
 import 'package:logging/logging.dart';
@@ -27,13 +29,18 @@ void main() {
 
 class MyApp extends StatelessWidget {
   MyApp({super.key}) {
-    Logger.root.onRecord.listen((record) {
-      //if in debug mode write to stdout
-      //can add else clause here to write logs to a file
-      //during production
-      if (kDebugMode) {
-        print('${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}');
-      }
+    getApplicationDocumentsDirectory().then((appDocumentsDirectory) {
+      File f = File("${appDocumentsDirectory.path}/logs/${DateTime.now().toIso8601String()}");
+      f.createSync(recursive: true);
+      Logger.root.onRecord.listen((record) {
+        String str = '${record.loggerName}: ${record.level.name}: ${record.time}: ${record.message}';
+        // ignore: avoid_print
+        print(str);
+        f.writeAsStringSync(
+          '$str\n',
+          mode: FileMode.append
+        );
+      });
     });
   }
 

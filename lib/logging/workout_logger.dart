@@ -108,8 +108,8 @@ class WorkoutLogger {
       "name": userName ?? "Unknown",
       "device_id": deviceId ?? "Unknown",
       "exercise_type": workout?.exerciseType.toString(),
-      "startTime": workout?.startTimestamp.millisecondsSinceEpoch,
-      "endTime": DateTime.now().millisecondsSinceEpoch,
+      "start_time": workout?.startTimestamp.millisecondsSinceEpoch,
+      "end_time": DateTime.now().millisecondsSinceEpoch,
       "partners": workout?.partners,
       //get averages for the workouts metrics
       "metrics": workout?.summarizeMetrics(),

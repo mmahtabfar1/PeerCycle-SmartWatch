@@ -56,10 +56,11 @@ class Workout {
     Map<String, double> map = {};
     metrics.forEach((feature, readings) {
       if (featuresToAverage.contains(feature)) {
-        map[feature.name] = readings.map((reading) => reading.value)
+        double averageVal = readings.map((reading) => reading.value)
           .map((value) => double.tryParse(value) ?? 0.0)
           .map((value) => value / readings.length)
           .reduce((total, current) => total + current);
+        map[feature.name] = double.parse(averageVal.toStringAsFixed(1));
       }
       //the sum is already represented by the last emitted
       //WorkoutReading in the list

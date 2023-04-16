@@ -6,14 +6,17 @@ import 'package:flutter/material.dart';
 import 'package:workout/workout.dart';
 import 'package:peer_cycle/utils.dart';
 import 'package:peer_cycle/workout/workout_wrapper.dart';
+import 'package:peer_cycle/workout/workout_start_result_wrapper.dart';
 import 'package:peer_cycle/widgets/metric_tile.dart';
 
 class PeerWorkoutScreen extends StatefulWidget {
   const PeerWorkoutScreen({
     super.key,
     required this.workout,
+    required this.workoutStartResultWrapper,
   });
   final WorkoutWrapper workout;
+  final WorkoutStartResultWrapper workoutStartResultWrapper;
 
   static final log = Logger("peer_workout_screen");
 
@@ -24,11 +27,13 @@ class PeerWorkoutScreen extends StatefulWidget {
 class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     with AutomaticKeepAliveClientMixin<PeerWorkoutScreen> {
   int heartRate = 0;
+  bool useHRPercentage = false;
   int calories = 0;
   int steps = 0;
   int distance = 0;
   int speed = 0;
   int power = 0;
+  bool usePowerPercentage = false;
   int cadence = 0;
   Duration _duration = Duration.zero;
   late Timer _timer;
@@ -50,6 +55,8 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
   void initState() {
     super.initState();
     startTimer();
+    useHRPercentage = widget.workoutStartResultWrapper.useHRPercentage;
+    usePowerPercentage = widget.workoutStartResultWrapper.usePowerPercentage;
     workoutStreamSubscription = widget.workout.stream.listen((reading) {
       switch (reading.feature) {
         case WorkoutFeature.unknown:
@@ -101,19 +108,6 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
     super.dispose();
     _timer.cancel();
     await workoutStreamSubscription.cancel();
-  }
-
-  double? getPartnerAttribute(int partnerNum, String attribute) {
-    final deviceData = BluetoothManager.instance.deviceData;
-    try {
-      return double.tryParse(
-          deviceData.values.elementAt(partnerNum)[attribute]!);
-    } catch (e) {
-      PeerWorkoutScreen.log.severe(e.toString());
-      PeerWorkoutScreen.log.severe("ERROR in getPartnerAttribute!!!");
-      PeerWorkoutScreen.log.severe("deviceData: $deviceData");
-      return null;
-    }
   }
 
   @override
@@ -182,17 +176,28 @@ class _PeerWorkoutScreenState extends State<PeerWorkoutScreen>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: <Widget>[
-                        MetricTile(
-                          icon: const Icon(Icons.favorite_outlined,
+                        GestureDetector(
+                          onTap: () {
+                            useHRPercentage = !useHRPercentage;
+                          },
+                          child: MetricTile(
+                            icon: const Icon(Icons.favorite_outlined,
                               color: Colors.red),
-                          value: "$heartRate bpm",
-                          valueColor: Colors.green,
+                            value: "$heartRate bpm",
+                            valueColor: Colors.green,
+                          ),
                         ),
-                        MetricTile(
-                          icon: const Icon(Icons.electric_bolt,
+                        GestureDetector(
+                          onTap: () {
+                            usePowerPercentage = !usePowerPercentage;
+                          },
+                          child:
+                          MetricTile(
+                            icon: const Icon(Icons.electric_bolt,
                               color: Colors.yellow),
-                          value: "$power W",
-                          valueColor: Colors.green,
+                            value: "$power W",
+                            valueColor: Colors.green,
+                          ),
                         ),
                       ],
                     ),

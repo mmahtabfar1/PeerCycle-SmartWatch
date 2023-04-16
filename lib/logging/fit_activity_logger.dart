@@ -126,6 +126,8 @@ class FitActivityLogger {
       String filePath,
       List<WorkoutReading> readings,
       ExerciseType exerciseType) async {
+    //if there are no readings don't create a fit file
+    if(readings.isEmpty) return;
     Uint8List bytes = createFitFile(readings, exerciseType).toBytes();
     File outFile = await File(filePath).create(recursive: true);
     await outFile.writeAsBytes(bytes);

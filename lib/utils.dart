@@ -33,3 +33,13 @@ const String useHRPercentageKey = "use_hr_percentage";
 const String usePowerPercentageKey = "use_power_percentage";
 const String userNameKey = "name";
 const String userAgeKey = "age";
+
+class Pair<T1, T2> {
+  final T1 first;
+  final T2 second;
+
+  Pair(this.first, this.second);
+
+  @override
+  String toString() => '($first, $second)';
+}

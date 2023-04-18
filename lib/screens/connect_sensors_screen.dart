@@ -48,7 +48,9 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
           state = _ConnectSensorsScreenStateType.CONNECTING;
         });
       } else if (event.first == DeviceConnectionState.connected) {
-        state = _ConnectSensorsScreenStateType.CONNECTED;
+        setState(() {
+          state = _ConnectSensorsScreenStateType.CONNECTED;
+        });
       }
     });
     scanSubscription = BleManager.instance.scan().listen((device) {
@@ -112,11 +114,11 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
                   state = _ConnectSensorsScreenStateType.DEFAULT;
                 });
               },
-              child: const Text("Connect Again",
+              child: const Text("Connect Another",
                   style: TextStyle(color: Colors.white)),
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
           SizedBox(
             height: 30,
             width: 120,

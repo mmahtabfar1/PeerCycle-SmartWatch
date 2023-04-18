@@ -12,7 +12,7 @@ import 'package:peer_cycle/logging/upload_manager.dart';
 import 'package:peer_cycle/logging/workout_logger.dart';
 
 void main() {
-  //event logging
+  //event logginbuild/app/outputs/flutter-apk/app-release.apkg
 
   WorkoutLogger.instance.addEvent({
     "event_type": AppEvent.appLaunched.value,

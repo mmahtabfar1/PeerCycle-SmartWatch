@@ -49,7 +49,7 @@ class WorkoutWrapper {
     watchSubscription = workout.stream.listen((reading) {
       _streamController.sink.add(reading);
     });
-    bleSubscription = BleManager.instance.stream.listen((reading) {
+    bleSubscription = BleManager.instance.dataStream.listen((reading) {
       _streamController.sink.add(reading);
     });
 

@@ -4,6 +4,8 @@ import 'package:logging/logging.dart';
 import 'package:workout/workout.dart';
 import 'package:flutter_reactive_ble/flutter_reactive_ble.dart' hide Logger;
 
+import '../utils.dart';
+
 class BleManager {
   static final BleManager _instance = BleManager._();
   static BleManager get instance => _instance;
@@ -16,8 +18,11 @@ class BleManager {
   static final Uuid _cyclingPowerServiceUUID = Uuid.parse('1818');
   static final Uuid _cyclingPowerCharacteristicUUID = Uuid.parse('2a63');
 
-  Stream<WorkoutReading> get stream => _streamController.stream;
-  final StreamController<WorkoutReading> _streamController = StreamController.broadcast();
+  Stream<WorkoutReading> get dataStream => _dataStreamController.stream;
+  final StreamController<WorkoutReading> _dataStreamController = StreamController.broadcast();
+
+  Stream<Pair<DeviceConnectionState, String>> get connectionUpdateStream => _connectionUpdateStreamController.stream;
+  final StreamController<Pair<DeviceConnectionState, String>> _connectionUpdateStreamController = StreamController.broadcast();
 
   final FlutterReactiveBle flutterReactiveBle = FlutterReactiveBle();
 
@@ -97,7 +102,7 @@ class BleManager {
         ).listen((data) {
           //create a workout reading from the data
           //sink into stream
-          _streamController.sink.add(
+          _dataStreamController.sink.add(
               WorkoutReading(
                 WorkoutFeature.heartRate,
                 data[1].toDouble().toString(),
@@ -108,8 +113,10 @@ class BleManager {
           log.severe("COULDN'T CONNECT TO HR SENSOR: $error");
         });
       }
+      _connectionUpdateStreamController.sink.add(Pair(connectionUpdate.connectionState, "HEART_RATE"));
       if(connectionUpdate.connectionState == DeviceConnectionState.disconnecting) {
         heartRateCharacteristicStream?.cancel();
+        connectedDevices.remove(_heartRateDeviceKey);
       }
     });
 
@@ -172,7 +179,7 @@ class BleManager {
           //TODO:
           //cadence index depends on the header (first 16 bits / index 0 and 1)
           //which determines in which location the cadence data will be
-          _streamController.sink.add(
+          _dataStreamController.sink.add(
             WorkoutReading(
               WorkoutFeature.power,
               _readPower(data).toDouble().toString(),
@@ -180,7 +187,7 @@ class BleManager {
             )
           );
 
-          _streamController.sink.add(
+          _dataStreamController.sink.add(
             WorkoutReading(
               WorkoutFeature.cadence,
               _readCadence(data).toString(),
@@ -189,6 +196,7 @@ class BleManager {
           );
         });
       }
+      _connectionUpdateStreamController.sink.add(Pair(connectionUpdate.connectionState, "POWER"));
       if(connectionUpdate.connectionState == DeviceConnectionState.disconnecting) {
         powerCharacteristicStream?.cancel();
       }

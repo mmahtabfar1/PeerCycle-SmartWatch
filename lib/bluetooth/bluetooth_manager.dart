@@ -241,7 +241,7 @@ class BluetoothManager {
     String? serialNum = deviceInfo.serialNumber;
 
     // Send to devices
-    String str = "name:{$name}:device_id:$deviceId:serial_number:$serialNum";
+    String str = "name:$name:device_id:$deviceId:serial_number:$serialNum";
     broadcastString(str);
   }
 

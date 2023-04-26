@@ -95,7 +95,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
       "workout_type": widget.exerciseType.toString(),
       "timestamp": DateTime.now().millisecondsSinceEpoch ~/ 1000,
     });
-    WorkoutLogger.instance.startWorkout(widget.exerciseType);
+    WorkoutLogger.instance.startWorkout(widget.exerciseType, maxHR, maxPower);
     return workout.start(
       exerciseType: widget.exerciseType,
       features: [

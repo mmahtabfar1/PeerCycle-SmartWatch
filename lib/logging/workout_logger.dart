@@ -39,8 +39,8 @@ class WorkoutLogger {
     }
   }
 
-  void startWorkout(ExerciseType exerciseType) {
-    workout = Workout(exerciseType);
+  void startWorkout(ExerciseType exerciseType, int maxHR, int maxPower) {
+    workout = Workout(exerciseType, targetHR: maxHR, targetPower: maxPower);
     // Add the workout partners
     BluetoothManager.instance.cleanupLingeringClosedConnections();
     final deviceData = BluetoothManager.instance.deviceData;

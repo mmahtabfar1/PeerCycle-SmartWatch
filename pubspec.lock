@@ -203,7 +203,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: e316f1b4879d0477c447eed3eda508f6e6546d86
+      resolved-ref: "6efabb4702d8232afc9a0d0daf6f5080d6a8eecf"
       url: "https://github.com/JordanHanley/flutter_bluetooth_serial.git"
     source: git
     version: "0.4.0"
@@ -317,10 +317,10 @@ packages:
     dependency: "direct main"
     description:
       name: intl
-      sha256: a3715e3bc90294e971cb7dc063fbf3cd9ee0ebf8604ffeafabd9e6f16abbdbe6
+      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.0"
+    version: "0.18.1"
   io:
     dependency: transitive
     description:
@@ -880,5 +880,5 @@ packages:
     source: hosted
     version: "3.1.1"
 sdks:
-  dart: ">=2.19.0 <4.0.0"
+  dart: ">=2.19.0 <3.0.0"
   flutter: ">=3.3.0"

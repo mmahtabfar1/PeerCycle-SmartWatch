@@ -3,17 +3,20 @@ import 'dart:convert';
 
 import 'partner.dart';
 import 'package:workout/workout.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:peer_cycle/utils.dart';
 
 class Workout {
-  ExerciseType exerciseType;
-  List<Partner> partners = [];
+  final ExerciseType exerciseType;
+  final List<Partner> partners = [];
   DateTime startTimestamp;
   DateTime? endTimestamp;
-  Map<WorkoutFeature, List<WorkoutReading>> metrics = {};
+  final Map<WorkoutFeature, List<WorkoutReading>> metrics = {};
+  final int targetHR;
+  final int targetPower;
 
-  Workout(this.exerciseType) : startTimestamp = DateTime.now();
+  Workout(this.exerciseType, {
+    this.targetHR = 150,
+    this.targetPower = 100,
+  }) : startTimestamp = DateTime.now();
 
   /// Add partner if doesn't already exist
   void addPartner(Partner partner) {
@@ -107,8 +110,10 @@ class Workout {
 
       //add target heartRate if the WorkoutFeature is heart rate
       if(key == WorkoutFeature.heartRate) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        map["target_heart_rate"] = prefs.get(maxHRKey);
+        map["target_heart_rate"] = targetHR;
+      }
+      else if(key == WorkoutFeature.power) {
+        map["target_power"] = targetPower;
       }
 
       output.add(MapEntry(_getMetricNameForJson(key), map));

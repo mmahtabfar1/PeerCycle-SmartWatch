@@ -1,3 +1,4 @@
+import 'package:peer_cycle/logging/partner.dart';
 import 'package:test/test.dart';
 import 'package:workout/workout.dart' hide Workout;
 import 'package:peer_cycle/logging/workout.dart';
@@ -5,7 +6,7 @@ import 'package:peer_cycle/logging/workout.dart';
 void main() {
   test('heartRateOnly', () async {
     //Given a workout with a series of workout readings
-    Workout workout = Workout(ExerciseType.walking);
+    Workout workout = Workout(ExerciseType.walking, targetHR: 150, targetPower: 100);
     workout.startTimestamp = DateTime.fromMillisecondsSinceEpoch(1000000000);
     List<WorkoutReading> readings = [
       WorkoutReading(WorkoutFeature.heartRate, "100", 1000000000),
@@ -61,4 +62,26 @@ void main() {
     //then we expect the average value of both to be 102.5
     expect(val, equals('{"heartRate":102.5,"power":102.5}'));
   });
+
+  test('partners', () async {
+    //Given a workout that contains a partner
+    Workout workout = Workout(ExerciseType.walking);
+    workout.addPartner(Partner(
+      name: "Jordan",
+      deviceId: "testDeviceId",
+      serialNum: "testSerialNum"
+    ));
+
+    //Given there are some workout readings in the workout
+    workout.addMetric(WorkoutReading(WorkoutFeature.heartRate, "100", 1000000000));
+    workout.addMetric(WorkoutReading(WorkoutFeature.heartRate, "101", 1000000001));
+    workout.addMetric(WorkoutReading(WorkoutFeature.heartRate, "102", 1000000002));
+
+    //When we serialize the workout to JSON format
+    final partnersJson = (await workout.toJson())["partners"];
+
+    //Then the partners value should be what we expect
+    expect(partnersJson.toString(), equals("[{name: Jordan, device_id: testDeviceId, serial_number: testSerialNum}]"));
+  });
+
 }

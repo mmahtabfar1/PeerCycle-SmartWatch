@@ -68,7 +68,8 @@ class Workout {
       //the sum is already represented by the last emitted
       //WorkoutReading in the list
       else if (featuresToSum.contains(feature)) {
-        map[feature.name] = double.tryParse(readings.last.value) ?? 0.0;
+        final roundedVal = double.parse(readings.last.value).toStringAsFixed(1);
+        map[feature.name] = double.tryParse(roundedVal) ?? 0.0;
       }
     });
     return jsonEncode(map);

@@ -16,11 +16,11 @@ class ConnectSensorsScreen extends StatefulWidget {
 }
 
 enum _ConnectSensorsScreenStateType {
-  CONNECTING,
-  CONNECTED,
-  DEFAULT,
-  DISCONNECTING,
-  DISCONNECTED
+  connecting,
+  connected,
+  idle,
+  disconnecting,
+  disconnected,
 }
 
 class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
@@ -36,7 +36,7 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
   //map device name to its widget to avoid duplicates
   Map<String, Widget> devices = {};
 
-  _ConnectSensorsScreenStateType state = _ConnectSensorsScreenStateType.DEFAULT;
+  _ConnectSensorsScreenStateType state = _ConnectSensorsScreenStateType.idle;
 
   @override
   void initState() {
@@ -45,11 +45,11 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
         BleManager.instance.connectionUpdateStream.listen((event) {
       if (event.first == DeviceConnectionState.connecting) {
         setState(() {
-          state = _ConnectSensorsScreenStateType.CONNECTING;
+          state = _ConnectSensorsScreenStateType.connecting;
         });
       } else if (event.first == DeviceConnectionState.connected) {
         setState(() {
-          state = _ConnectSensorsScreenStateType.CONNECTED;
+          state = _ConnectSensorsScreenStateType.connected;
         });
       }
     });
@@ -111,7 +111,7 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
               width: 100,
               onPressed: () {
                 setState(() {
-                  state = _ConnectSensorsScreenStateType.DEFAULT;
+                  state = _ConnectSensorsScreenStateType.idle;
                 });
               },
               child: const Text("Connect Another",
@@ -155,7 +155,7 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
               width: 100,
               onPressed: () {
                 setState(() {
-                  state = _ConnectSensorsScreenStateType.DEFAULT;
+                  state = _ConnectSensorsScreenStateType.idle;
                 });
               },
               child: const Text("Try Again", style: TextStyle(color: Colors.white)),
@@ -211,15 +211,15 @@ class _ConnectSensorsScreenState extends State<ConnectSensorsScreen> {
         backgroundColor: Colors.black,
         body: WatchShape(builder: (context, shape, widget) {
           switch (state) {
-            case _ConnectSensorsScreenStateType.CONNECTING:
+            case _ConnectSensorsScreenStateType.connecting:
               return getConnectingScreen();
-            case _ConnectSensorsScreenStateType.CONNECTED:
+            case _ConnectSensorsScreenStateType.connected:
               return getConnectedScreen();
-            case _ConnectSensorsScreenStateType.DEFAULT:
+            case _ConnectSensorsScreenStateType.idle:
               return getDefaultScreen(context);
-            case _ConnectSensorsScreenStateType.DISCONNECTING:
+            case _ConnectSensorsScreenStateType.disconnecting:
               return getDisconnectedScreen();
-            case _ConnectSensorsScreenStateType.DISCONNECTED:
+            case _ConnectSensorsScreenStateType.disconnected:
               return getDisconnectedScreen();
           }
         }));

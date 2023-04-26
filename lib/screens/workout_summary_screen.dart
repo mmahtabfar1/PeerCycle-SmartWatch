@@ -34,8 +34,6 @@ class WorkoutSummaryScreen extends StatelessWidget {
         if(!snapshot.hasData) {
           return const CircularProgressIndicator();
         }
-        print(snapshot.data?["start_time"]);
-        print(snapshot.data?["end_time"]);
         Map<String, dynamic> metricMap = jsonDecode(snapshot.data!["metrics"]);
         return Scaffold(
           backgroundColor: Colors.black,

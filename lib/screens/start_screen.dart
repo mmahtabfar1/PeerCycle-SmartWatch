@@ -66,13 +66,14 @@ class StartScreen extends StatelessWidget {
                         onPressed: () async {
                           bool success = await BluetoothManager.instance.requestBluetoothPermissions();
                           if(!success) return;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                const ConnectSensorsScreen()
-                            ),
-                          );
+                          if(context.mounted) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const ConnectSensorsScreen()
+                              ),
+                            );
+                          }
                         },
                         child: const Text(
                           "CONNECT SENSORS",
